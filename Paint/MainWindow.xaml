@@ -9,6 +9,7 @@
     Title="MainWindow"
     Width="800"
     Height="450"
+    Loaded="Window_Loaded"
     mc:Ignorable="d">
     <Window.Resources>
         <Style x:Key="ActionGroup" TargetType="StackPanel">
@@ -16,7 +17,6 @@
             <Setter Property="HorizontalAlignment" Value="Left" />
         </Style>
     </Window.Resources>
-
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -86,6 +86,25 @@
             </StackPanel>
             <Separator Margin="8,0,8,0" />
             <StackPanel Orientation="Vertical">
+                <ui:DropDownButton Width="150" Content="Stroke type" />
+                <StackPanel Orientation="Horizontal">
+                    <Slider
+                        x:Name="thicknessSlider"
+                        Width="80"
+                        Margin="8,0,8,0"
+                        Maximum="30"
+                        Minimum="1"
+                        ValueChanged="thicknessSlider_ValueChanged" />
+                    <ui:TextBlock VerticalAlignment="Center" Text="{Binding Thickness, Mode=OneWay}" />
+                    <ui:TextBlock VerticalAlignment="Center" Text=" px" />
+                </StackPanel>
+                <ui:TextBlock
+                    VerticalAlignment="Bottom"
+                    Text="Brush"
+                    TextAlignment="Center" />
+            </StackPanel>
+            <Separator Margin="8,0,8,0" />
+            <StackPanel Orientation="Vertical">
                 <ui:Button
                     Margin="8"
                     HorizontalAlignment="Center"
@@ -98,6 +117,10 @@
         <Grid
             x:Name="DrawSpace"
             Grid.Row="2"
-            Margin="8" />
+            Margin="8"
+            Background="White"
+            MouseDown="DrawSpace_MouseDown"
+            MouseMove="DrawSpace_MouseMove"
+            MouseUp="DrawSpace_MouseUp" />
     </Grid>
 </Window>

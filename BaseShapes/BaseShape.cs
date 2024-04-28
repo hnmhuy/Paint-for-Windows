@@ -15,6 +15,7 @@ namespace BaseShapes
         protected SolidColorBrush _colorFill;
         protected double strokeThickness;
         protected DoubleCollection dashArray;
+        protected bool isDashStroke = false;
 
         public BaseShape()
         {
@@ -26,6 +27,7 @@ namespace BaseShapes
         }
         public String IconName { get { return _iconName; } }
         public String Name { get { return _name; } }
+        public Canvas content { get { return _canvas; } }
         public Point Start { get { return _start; } }
         public Point End { get { return _end; } }
 
@@ -83,5 +85,9 @@ namespace BaseShapes
         public abstract object Clone();
         public abstract Canvas Render();
         public abstract void Resize();
+        public abstract void SetStrokeColor(SolidColorBrush color);
+        public abstract void SetStrokeFill(SolidColorBrush fill);
+        public abstract void SetStrokeThickness(double thickness);
+        public abstract void SetDashStroke(DoubleCollection dash);
     }
 }

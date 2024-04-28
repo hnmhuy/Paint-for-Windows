@@ -1,5 +1,5 @@
-﻿using BaseShapes;
-using System.Windows;
+﻿using System.Windows;
+using System.Windows.Input;
 
 namespace Paint
 {
@@ -8,52 +8,39 @@ namespace Paint
     /// </summary>
     public partial class MainWindow : Window
     {
-
-        private readonly BaseShape prototype = new ShapeRectangle.ShapeRectangle();
-        private List<BaseShape> shapes = new List<BaseShape>();
-        private bool isDrawing;
-        Point start;
-        Point end;
-        UIElement drawingElement;
-
+        private PaintApplication application = new PaintApplication();
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = application;
+            application.GenerateShapeControls(ShapeList);
         }
 
-        private void paper_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            //start = e.GetPosition(paper);
-            //prototype.SetPosition(start, start);
-            //drawingElement = prototype.Render();
-            //paper.Children.Add(drawingElement);
-            //isDrawing = true;
+            DrawSpace.Children.Add(application.CurrentPage.Content);
         }
 
-        private void paper_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+        private void DrawSpace_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            //if (isDrawing)
-            //{
-            //    end = e.GetPosition(paper);
-            //    if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
-            //    {
-            //        prototype.SetProportionalPosition(start, end);
-            //    }
-            //    else
-            //    {
-            //        prototype.SetPosition(start, end);
-            //    }
-            //    prototype.Resize();
-            //    Canvas.SetTop(drawingElement, prototype.Start.Y);
-            //    Canvas.SetLeft(drawingElement, prototype.Start.X);
-
-            //}
+            application.StartDrawing(e.GetPosition(application.CurrentPage.Content));
         }
 
-        private void paper_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void DrawSpace_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            shapes.Add((BaseShape)prototype.Clone());
-            isDrawing = false;
+            // Checking if the shift button is pressing
+            bool isShift = (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift));
+            application.Drawing(e.GetPosition(application.CurrentPage.Content), isShift);
+        }
+
+        private void DrawSpace_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            application.DrawComplete();
+        }
+
+        private void thicknessSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            application.Thickness = Math.Round(e.NewValue);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using BaseShapes;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Shapes;
 
 namespace ShapeRectangle
@@ -11,7 +12,7 @@ namespace ShapeRectangle
         public ShapeRectangle()
         {
             _name = "Rectangle";
-            _iconName = String.Empty;
+            _iconName = "rectangle.png";
         }
 
         public override object Clone()
@@ -32,7 +33,6 @@ namespace ShapeRectangle
             };
             this._canvas.Children.Add(rectangle);
             return _canvas;
-
         }
 
         public override void Resize()
@@ -41,6 +41,30 @@ namespace ShapeRectangle
             {
                 rectangle.Width = Math.Abs(_start.X - _end.X);
                 rectangle.Height = Math.Abs(_start.Y - _end.Y);
+            }
+        }
+
+        public override void SetDashStroke(DoubleCollection dash)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void SetStrokeColor(SolidColorBrush color)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void SetStrokeFill(SolidColorBrush fill)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void SetStrokeThickness(double thickness)
+        {
+            this.strokeThickness = thickness;
+            if (rectangle != null)
+            {
+                rectangle.StrokeThickness = thickness;
             }
         }
     }

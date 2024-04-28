@@ -21,4 +21,10 @@
     <Folder Include="Assets\Icon\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Assets\Icon\rectangle.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

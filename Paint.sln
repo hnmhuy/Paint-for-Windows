@@ -5,9 +5,9 @@ VisualStudioVersion = 17.10.34707.107
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Paint", "Paint\Paint.csproj", "{2595BCE7-7749-46A4-8FF3-101D464B57D9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseShapes", "BaseShapes\BaseShapes.csproj", "{FFCE592D-B5A6-41C0-B4BF-64F491B6B0F6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BaseShapes", "BaseShapes\BaseShapes.csproj", "{FFCE592D-B5A6-41C0-B4BF-64F491B6B0F6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShapeRectangle", "ShapeRectangle\ShapeRectangle.csproj", "{90E5F985-CC3C-4A2C-824E-8A0F82027A9C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShapeRectangle", "ShapeRectangle\ShapeRectangle.csproj", "{90E5F985-CC3C-4A2C-824E-8A0F82027A9C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
