@@ -16,6 +16,13 @@
             <Setter Property="Orientation" Value="Horizontal" />
             <Setter Property="HorizontalAlignment" Value="Left" />
         </Style>
+
+        <Style x:Key="ButtonGroup" TargetType="StackPanel">
+            <Setter Property="Orientation" Value="Vertical" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="8" />
+        </Style>
+
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -23,28 +30,12 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-
-        <Menu
-            Name="TopBar"
-            Grid.Row="0"
-            Background="#2000">
-            <ui:MenuItem Header="File">
-                <MenuItem Header="New" />
-                <MenuItem Header="Open..." />
-                <MenuItem Header="Save" />
-                <Separator />
-                <MenuItem Header="Exit" />
-            </ui:MenuItem>
-            <Separator />
-            <ui:MenuItem Icon="{ui:SymbolIcon ArrowUndo24}" />
-            <ui:MenuItem Icon="{ui:SymbolIcon ArrowRedo24}" />
-        </Menu>
-
+        <Separator />
         <StackPanel
             Name="ActionMenu"
             Grid.Row="1"
             Style="{StaticResource ActionGroup}">
-            <StackPanel Orientation="Vertical">
+            <StackPanel Style="{StaticResource ButtonGroup}">
                 <ui:Button
                     Margin="8"
                     HorizontalAlignment="Center"
@@ -53,9 +44,9 @@
                 <ui:TextBlock Text="Selection" TextAlignment="Center" />
             </StackPanel>
 
-            <Separator Margin="8,0,8,0" />
+            <Separator />
 
-            <StackPanel Orientation="Vertical">
+            <StackPanel Style="{StaticResource ButtonGroup}">
                 <StackPanel Orientation="Horizontal">
                     <ui:Button
                         Margin="8"
@@ -76,16 +67,16 @@
                 <ui:TextBlock Text="Tools" TextAlignment="Center" />
             </StackPanel>
 
-            <Separator Margin="8,0,8,0" />
-            <StackPanel Name="ShapeActions" Orientation="Vertical">
+            <Separator />
+            <StackPanel Name="ShapeActions" Style="{StaticResource ButtonGroup}">
                 <StackPanel x:Name="ShapeList" Orientation="Horizontal" />
                 <ui:TextBlock
                     VerticalAlignment="Bottom"
                     Text="Shapes"
                     TextAlignment="Center" />
             </StackPanel>
-            <Separator Margin="8,0,8,0" />
-            <StackPanel Orientation="Vertical">
+            <Separator />
+            <StackPanel Style="{StaticResource ButtonGroup}">
                 <ui:DropDownButton Width="150" Content="Stroke type" />
                 <StackPanel Orientation="Horizontal">
                     <Slider
@@ -103,8 +94,8 @@
                     Text="Brush"
                     TextAlignment="Center" />
             </StackPanel>
-            <Separator Margin="8,0,8,0" />
-            <StackPanel Orientation="Vertical">
+            <Separator />
+            <StackPanel Style="{StaticResource ButtonGroup}">
                 <ui:Button
                     Margin="8"
                     HorizontalAlignment="Center"
@@ -114,13 +105,47 @@
             </StackPanel>
         </StackPanel>
         <Separator />
-        <Grid
-            x:Name="DrawSpace"
-            Grid.Row="2"
-            Margin="8"
-            Background="White"
-            MouseDown="DrawSpace_MouseDown"
-            MouseMove="DrawSpace_MouseMove"
-            MouseUp="DrawSpace_MouseUp" />
+        <Border Grid.Row="2" Background="LightGray">
+            <ScrollViewer
+                Margin="0,8,0,8"
+                HorizontalScrollBarVisibility="Auto"
+                VerticalScrollBarVisibility="Auto">
+                <Grid
+                    x:Name="DrawSpace"
+                    Grid.Row="2"
+                    Width="720"
+                    Height="400"
+                    Margin="8"
+                    Background="White"
+                    MouseDown="DrawSpace_MouseDown"
+                    MouseMove="DrawSpace_MouseMove"
+                    MouseUp="DrawSpace_MouseUp" />
+            </ScrollViewer>
+        </Border>
+        <Border
+            Grid.Row="0"
+            BorderBrush="LightGray"
+            BorderThickness="0,0,0,1">
+            <Menu x:Name="TopBar">
+                <MenuItem Header="File">
+                    <MenuItem Header="New" />
+                    <MenuItem Header="Open..." />
+                    <MenuItem Header="Save" />
+                    <Separator />
+                    <MenuItem Header="Exit" />
+                </MenuItem>
+                <Separator />
+                <MenuItem
+                    Name="Undo"
+                    Click="Undo_Click"
+                    Icon="{ui:SymbolIcon ArrowUndo24}"
+                    IsEnabled="{Binding CanUndo}" />
+                <MenuItem
+                    Name="Redo"
+                    Click="Redo_Click"
+                    Icon="{ui:SymbolIcon ArrowRedo24}"
+                    IsEnabled="{Binding CanRedo}" />
+            </Menu>
+        </Border>
     </Grid>
 </Window>

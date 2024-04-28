@@ -1,27 +1,25 @@
 ﻿using BaseShapes;
 
-namespace Paint.Command
+namespace Paint.Commands
 {
     public class CreateShapeCommand : Command
     {
-        private BaseShape prototype;
         private Paper receiver;
 
         public CreateShapeCommand(BaseShape prototype, Paper receiver)
         {
-            this.prototype = prototype;
+            this.backup = prototype;
             this.receiver = receiver;
         }
 
         public override void Execute()
         {
-            this.backup = (BaseShape)prototype.Clone();
-            receiver.AddShape(prototype);
+            receiver.AddShape(backup);
         }
 
         public override void Undo()
         {
-            throw new NotImplementedException();
+            this.receiver.RemoveShape(backup);
         }
     }
 }

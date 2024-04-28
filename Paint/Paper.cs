@@ -15,13 +15,18 @@ namespace Paint
             _content = new Canvas();
         }
 
-        public void AddShape(BaseShape prototype)
+        public void AddShape(BaseShape shape)
         {
-            BaseShape shape = (BaseShape)prototype.Clone();
             drawnShapes.Add(shape);
-            _content.Children.Add(shape.Render());
+            _content.Children.Add(shape.content);
             Canvas.SetTop(shape.content, shape.Start.Y);
             Canvas.SetLeft(shape.content, shape.Start.X);
+        }
+
+        public void RemoveShape(BaseShape shape)
+        {
+            drawnShapes.Remove(shape);
+            _content.Children.Remove(shape.content);
         }
     }
 }

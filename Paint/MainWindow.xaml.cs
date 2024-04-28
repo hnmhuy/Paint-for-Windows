@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Diagnostics;
+using System.Windows;
 using System.Windows.Input;
 
 namespace Paint
@@ -41,6 +42,18 @@ namespace Paint
         private void thicknessSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             application.Thickness = Math.Round(e.NewValue);
+        }
+
+        private void Undo_Click(object sender, RoutedEventArgs e)
+        {
+            Debug.WriteLine("Undo");
+            application.Undo();
+        }
+
+        private void Redo_Click(object sender, RoutedEventArgs e)
+        {
+            Debug.WriteLine("Redo");
+            application.Redo();
         }
     }
 }

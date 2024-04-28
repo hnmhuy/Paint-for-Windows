@@ -1,6 +1,6 @@
 ﻿using BaseShapes;
 
-namespace Paint.Command
+namespace Paint.Commands
 {
     public abstract class Command
     {

@@ -1,5 +1,5 @@
 ﻿using BaseShapes;
-using Paint.Command;
+using Paint.Commands;
 using System.ComponentModel;
 using System.IO;
 using System.Reflection;
@@ -10,7 +10,7 @@ using System.Windows.Media.Imaging;
 
 namespace Paint
 {
-    internal class PaintApplication : INotifyPropertyChanged
+    public class PaintApplication : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -34,7 +34,6 @@ namespace Paint
 
         // Brush attribute
         private double thickness = 1;
-
         public double Thickness
         {
             get { return thickness; }
@@ -46,12 +45,38 @@ namespace Paint
             }
         }
 
+        // Control attribute
+        private CommandHistory commandHistory = new CommandHistory();
+        private UndoCommand undoCommand;
+        private bool canUndo = false;
+        public bool CanUndo
+        {
+            get { return canUndo; }
+            set
+            {
+                canUndo = value;
+                OnPropertyChanged(nameof(CanUndo));
+            }
+        }
+        private bool canRedo = false;
+        public bool CanRedo
+        {
+            get { return canRedo; }
+            set
+            {
+                canRedo = value;
+                OnPropertyChanged(nameof(CanRedo));
+            }
+        }
+
         // Constructor
         public PaintApplication()
         {
             LoadPrototypes();
             papers.Add(currPage = new Paper());
+            undoCommand = new UndoCommand(commandHistory);
         }
+
         private void LoadPrototypes()
         {
             String folder = AppDomain.CurrentDomain.BaseDirectory;
@@ -107,6 +132,7 @@ namespace Paint
         }
         public void StartDrawing(Point point)
         {
+            if (currPrototype == null) return;
             initalPoint = point;
             isDrawing = true;
             currPrototype.SetPosition(point, point);
@@ -129,11 +155,27 @@ namespace Paint
         }
         public void DrawComplete()
         {
+            if (!isDrawing || currPrototype == null) return;
             isDrawing = false;
             currPage.Content.Children.Remove(drawingShape);
-            CreateShapeCommand command = new CreateShapeCommand(currPrototype, currPage);
+            BaseShape generatedShape = (BaseShape)currPrototype.Clone();
+            generatedShape.Render();
+            CreateShapeCommand command = new CreateShapeCommand(generatedShape, currPage);
+            this.ExecuteCommand(command);
+        }
+
+        private void ExecuteCommand(Command command)
+        {
             editor.SetCommand(command);
             editor.ExecuteCommand();
+            commandHistory.AddCoomand(command);
+            UpdateHistoryState();
+        }
+
+        private void UpdateHistoryState()
+        {
+            CanUndo = commandHistory.CanUndo();
+            CanRedo = commandHistory.CanRedo();
         }
 
         private void StrokeThicknessChanged()
@@ -142,6 +184,18 @@ namespace Paint
             {
                 item.SetStrokeThickness(thickness);
             }
+        }
+
+        public void Undo()
+        {
+            undoCommand.Execute();
+            UpdateHistoryState();
+        }
+
+        public void Redo()
+        {
+            undoCommand.Undo();
+            UpdateHistoryState();
         }
     }
 }

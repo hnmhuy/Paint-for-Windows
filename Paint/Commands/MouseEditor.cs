@@ -1,4 +1,4 @@
-﻿namespace Paint.Command
+﻿namespace Paint.Commands
 {
     public class MouseEditor
     {
