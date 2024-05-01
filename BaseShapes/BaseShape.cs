@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -31,7 +32,7 @@ namespace BaseShapes
         public Point Start { get { return _start; } }
         public Point End { get { return _end; } }
 
-        public void SetPosition(Point start, Point end)
+        public virtual void SetPosition(Point start, Point end)
         {
             // Ensure start position is always smaller than end position
             double minX = Math.Min(start.X, end.X);
@@ -41,6 +42,8 @@ namespace BaseShapes
 
             _start = new Point(minX, minY);
             _end = new Point(maxX, maxY);
+
+            
         }
 
         public void SetProportionalPosition(Point start, Point end)
