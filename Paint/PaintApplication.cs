@@ -1,6 +1,7 @@
 ﻿using BaseShapes;
 using Paint.Commands;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Windows;
@@ -151,6 +152,7 @@ namespace Paint
                 currPrototype.Resize();
                 Canvas.SetTop(drawingShape, currPrototype.Start.Y);
                 Canvas.SetLeft(drawingShape, currPrototype.Start.X);
+                
             }
         }
         public void DrawComplete()

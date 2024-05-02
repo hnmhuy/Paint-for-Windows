@@ -1,46 +1,45 @@
-﻿using BaseShapes;
-using System.Diagnostics;
+using BaseShapes;
+using System.Drawing;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-namespace ShapeRectangle
+namespace ShapeEllipse
 {
-    public class ShapeRectangle : BaseShape
+    public class ShapeEllipse : BaseShape
     {
-        private Rectangle rectangle;
+        private Ellipse ellipse;
+        public ShapeEllipse() {
+            _name = "Ellipse";
+            _iconName = "ellipse.png";
 
-        public ShapeRectangle()
-        {
-            _name = "Rectangle";
-            _iconName = "rectangle.png";
         }
-
         public override object Clone()
         {
-            return MemberwiseClone();
+           return MemberwiseClone();
         }
 
         public override Canvas Render()
         {
             _canvas = new Canvas();
-            rectangle = new Rectangle()
+            ellipse = new Ellipse()
             {
                 Width = Math.Abs(_start.X - _end.X),
-                Height = Math.Abs(_end.Y - _start.Y),
+                Height = Math.Abs(_start.Y - _end.Y),
                 StrokeThickness = strokeThickness,
-                Stroke = this._colorStroke,
                 Fill = this._colorFill,
+                Stroke = this._colorStroke,
             };
-            this._canvas.Children.Add(rectangle);
+            _canvas.Children.Add(ellipse);
             return _canvas;
         }
+
         public override void Resize()
         {
-            if (rectangle != null)
+            if (ellipse != null)
             {
-                rectangle.Width = Math.Abs(_start.X - _end.X);
-                rectangle.Height = Math.Abs(_start.Y - _end.Y);
+                ellipse.Width = Math.Abs(_start.X - _end.X);
+                ellipse.Height = Math.Abs(_start.Y - _end.Y);
             }
         }
 
@@ -62,10 +61,11 @@ namespace ShapeRectangle
         public override void SetStrokeThickness(double thickness)
         {
             this.strokeThickness = thickness;
-            if (rectangle != null)
+            if (ellipse != null)
             {
-                rectangle.StrokeThickness = thickness;
+                ellipse.StrokeThickness = thickness;
             }
         }
     }
+
 }

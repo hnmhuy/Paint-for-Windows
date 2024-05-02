@@ -14,7 +14,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BaseShapes\BaseShapes.csproj" />
+    <ProjectReference Include="..\ShapeEllipse\ShapeEllipse.csproj" />
+    <ProjectReference Include="..\ShapeLine\ShapeLine.csproj" />
     <ProjectReference Include="..\ShapeRectangle\ShapeRectangle.csproj" />
+    <ProjectReference Include="..\ShapeStar\ShapeStar.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,7 +25,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Assets\Icon\ellipse.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\Icon\line.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Assets\Icon\rectangle.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\Icon\star.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
