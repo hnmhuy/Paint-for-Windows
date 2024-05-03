@@ -113,8 +113,8 @@
                 <Grid
                     x:Name="DrawSpace"
                     Grid.Row="2"
-                    Width="720"
-                    Height="400"
+                    Width="1846"
+                    Height="776"
                     Margin="8"
                     Background="White"
                     MouseDown="DrawSpace_MouseDown"
