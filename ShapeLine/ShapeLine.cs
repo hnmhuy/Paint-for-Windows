@@ -103,7 +103,11 @@ namespace ShapeLine
 
         public override void SetStrokeColor(SolidColorBrush color)
         {
-            throw new NotImplementedException();
+            this._colorStroke = color;
+            if (line != null)
+            {
+                line.Stroke = color;
+            }
         }
 
         public override void SetStrokeFill(SolidColorBrush fill)

@@ -62,7 +62,6 @@ namespace Paint
             {
                 // Retrieve the Tag property value, which contains the stroke dash array information
                 string tagValue = clickedItem.Tag as string;
-
                 // Set the content of the DropDownButton to a Canvas
                 SetCanvasContent(tagValue);
             }
@@ -72,10 +71,18 @@ namespace Paint
         {
             // Create a Canvas with a Line based on the tagValue
             Canvas canvas = new Canvas();
-            canvas.Style = (Style)FindResource("CanvasStokeType");
-            Line line = new Line();
-            line.Style = (Style)FindResource("LineStokeType"); // Apply line style if necessary
-
+            canvas.Height = 20;
+            canvas.Width = 70;
+            Line line = new Line()
+            {
+                X1 = 0,
+                X2 = 70,
+                Y1 = 10,
+                Y2 = 10,
+                Stroke = Brushes.Black,
+                StrokeThickness = 2,
+            };
+ 
             // Set the StrokeDashArray property based on tagValue
             switch (tagValue)
             {
@@ -120,6 +127,24 @@ namespace Paint
         {
             Debug.WriteLine("Redo");
             application.Redo();
+        }
+
+        private void OutlineColorPicker_SelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<Color?> e)
+        {
+            if(e.NewValue.HasValue)
+            {
+                application.StrokeColor = new SolidColorBrush(e.NewValue.Value);
+                Debug.WriteLine("Outline color: " + e.NewValue.Value);
+
+            }
+        }
+
+        private void FillColorPicker1_SelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<Color?> e)
+        {
+            if (e.NewValue.HasValue)
+            {
+                Debug.WriteLine(e.NewValue.Value);
+            }
         }
     }
 }

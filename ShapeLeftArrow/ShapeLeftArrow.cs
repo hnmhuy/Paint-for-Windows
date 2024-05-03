@@ -77,7 +77,11 @@ namespace ShapeLeftArrow
 
         public override void SetStrokeColor(SolidColorBrush color)
         {
-            throw new NotImplementedException();
+            this._colorStroke = color;
+            if (leftArrow != null)
+            {
+                leftArrow.Stroke = color;
+            }
         }
 
         public override void SetStrokeFill(SolidColorBrush fill)

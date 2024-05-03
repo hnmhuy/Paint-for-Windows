@@ -57,7 +57,11 @@ namespace ShapeRectangle
 
         public override void SetStrokeColor(SolidColorBrush color)
         {
-            throw new NotImplementedException();
+            this._colorStroke = color;
+            if (rectangle != null)
+            {
+                rectangle.Stroke = color;
+            }
         }
 
         public override void SetStrokeFill(SolidColorBrush fill)

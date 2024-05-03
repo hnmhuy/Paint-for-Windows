@@ -1,5 +1,6 @@
 using BaseShapes;
 using System.Drawing;
+using System.Security.Policy;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -56,7 +57,11 @@ namespace ShapeEllipse
 
         public override void SetStrokeColor(SolidColorBrush color)
         {
-            throw new NotImplementedException();
+            this._colorStroke = color;
+            if (ellipse != null)
+            {
+                ellipse.Stroke = color;
+            }
         }
 
         public override void SetStrokeFill(SolidColorBrush fill)

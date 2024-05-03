@@ -60,6 +60,17 @@ namespace Paint
             }
         }
 
+        private SolidColorBrush strokeColor = Brushes.Black;
+        public SolidColorBrush StrokeColor
+        {
+            get { return strokeColor; }
+            set
+            {
+                strokeColor = value;
+                OnPropertyChanged(nameof(StrokeColor));
+                ColorStrokeChanged();
+            }
+        }
         // Control attribute
         private CommandHistory commandHistory = new CommandHistory();
         private UndoCommand undoCommand;
@@ -209,6 +220,15 @@ namespace Paint
                 item.SetDashStroke(strokeType);
             }
         }
+
+        private void ColorStrokeChanged()
+        {
+            foreach (var item in prototypes)
+            {
+                item.SetStrokeColor(strokeColor);
+            }
+        }
+
 
         public void Undo()
         {

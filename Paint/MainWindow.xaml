@@ -6,6 +6,7 @@
     xmlns:local="clr-namespace:Paint"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     Title="MainWindow"
     Width="800"
     Height="450"
@@ -25,17 +26,50 @@
 
         <Style x:Key="LineStokeType" TargetType="Line">
             <Setter Property="X1" Value="0"/>
-            <Setter Property="X2" Value="150"/>
+            <Setter Property="X2" Value="100"/>
             <Setter Property="Y1" Value="10"/>
             <Setter Property="Y2" Value="10"/>
             <Setter Property="Stroke" Value="Black"/>
             <Setter Property="StrokeThickness" Value="2"/>
-            
         </Style>
+
         <Style x:Key="CanvasStokeType" TargetType="Canvas">
             <Setter Property="Height" Value="20"/>
-            <Setter Property="Width" Value="150"/>
-            
+            <Setter Property="Width" Value="100"/>
+        </Style>
+
+        <Style x:Key="CircleButton" TargetType="Button">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ButtonBase}">
+                        <Border x:Name="border" CornerRadius="1000" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                            <ContentPresenter x:Name="contentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" ContentStringFormat="{TemplateBinding ContentStringFormat}" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Button.IsDefaulted" Value="True">
+                                <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" TargetName="border" Value="#FFBEE6FD"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="#FF3C7FB1"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" TargetName="border" Value="#FFC4E5F6"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="#FF2C628B"/>
+                            </Trigger>
+                            <Trigger Property="ToggleButton.IsChecked" Value="True">
+                                <Setter Property="Background" TargetName="border" Value="#FFBCDDEE"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="#FF245A83"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" TargetName="border" Value="#FFF4F4F4"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="#FFADB2B5"/>
+                                <Setter Property="Foreground" Value="#FF838383"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
     </Window.Resources>
@@ -92,69 +126,81 @@
             </StackPanel>
             <Separator />
             <StackPanel Style="{StaticResource ButtonGroup}">
-                <ui:DropDownButton x:Name="strokeTypeList" Width="200" PreviewMouseLeftButtonDown="DropDownButton_PreviewMouseLeftButtonDown">
-                    <ui:DropDownButton.Content>
-                        <!-- Content goes here -->
-                        <TextBlock Text="Stroke type"/>
-                    </ui:DropDownButton.Content>
-                    <ui:DropDownButton.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Tag="Custom 0" Click="MenuStrokeItem_Click">
-                                <MenuItem.Header>
-                                    <Canvas Style="{StaticResource CanvasStokeType}">
-                                        <Line Style="{StaticResource LineStokeType}"/>
-                                    </Canvas>
-                                </MenuItem.Header>
-                            </MenuItem>
-                            <MenuItem Tag="Custom 1" Click="MenuStrokeItem_Click">
-                                <MenuItem.Header>
-                                    <Canvas Style="{StaticResource CanvasStokeType}">
-                                        <Line Style="{StaticResource LineStokeType}" StrokeDashArray="1"/>
-                                    </Canvas>
-                                </MenuItem.Header>
-                            </MenuItem>
-                            <MenuItem Tag="Custom 2" Click="MenuStrokeItem_Click">
-                                <MenuItem.Header>
-                                    <Canvas Style="{StaticResource CanvasStokeType}">
-                                        <Line Style="{StaticResource LineStokeType}" StrokeDashArray="1 3"/>
-                                    </Canvas>
-                                </MenuItem.Header>
-                            </MenuItem>
-                            <MenuItem Tag="Custom 3" Click="MenuStrokeItem_Click">
-                                <MenuItem.Header>
-                                    <Canvas Style="{StaticResource CanvasStokeType}">
-                                        <Line Style="{StaticResource LineStokeType}" StrokeDashArray="4 1"/>
-                                    </Canvas>
-                                </MenuItem.Header>
-                            </MenuItem>
-                            <MenuItem Tag="Custom 4" Click="MenuStrokeItem_Click">
-                                <MenuItem.Header>
-                                    <Canvas Style="{StaticResource CanvasStokeType}">
-                                        <Line Style="{StaticResource LineStokeType}" StrokeDashArray="4 3"/>
-                                    </Canvas>
-                                </MenuItem.Header>
-                            </MenuItem>
-                            <MenuItem Tag="Custom 5" Click="MenuStrokeItem_Click">
-                                <MenuItem.Header>
-                                    <Canvas Style="{StaticResource CanvasStokeType}">
-                                        <Line Style="{StaticResource LineStokeType}" StrokeDashArray="5 2 2 2"/>
-                                    </Canvas>
-                                </MenuItem.Header>
-                            </MenuItem>
-                            <MenuItem Tag="Custom 6" Click="MenuStrokeItem_Click">
-                                <MenuItem.Header>
-                                    <Canvas Style="{StaticResource CanvasStokeType}">
-                                        <Line Style="{StaticResource LineStokeType}" StrokeDashArray="5 2 1 1 1 2"/> 
-                                    </Canvas>
-                                </MenuItem.Header>
-                            </MenuItem>
-                        </ContextMenu>
-                    </ui:DropDownButton.ContextMenu>
-                </ui:DropDownButton>
-                    <StackPanel Orientation="Horizontal">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <ui:DropDownButton x:Name="strokeTypeList" Width="120" Height="30" VerticalAlignment="Center" PreviewMouseLeftButtonDown="DropDownButton_PreviewMouseLeftButtonDown">
+                        <ui:DropDownButton.Content>
+                            <!-- Content goes here -->
+                            <TextBlock Text="Stroke type"/>
+                        </ui:DropDownButton.Content>
+                        <ui:DropDownButton.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Tag="Custom 0" Click="MenuStrokeItem_Click">
+                                    <MenuItem.Header>
+                                        <Canvas Style="{StaticResource CanvasStokeType}">
+                                            <Line Style="{StaticResource LineStokeType}"/>
+                                        </Canvas>
+                                    </MenuItem.Header>
+                                </MenuItem>
+                                <MenuItem Tag="Custom 1" Click="MenuStrokeItem_Click">
+                                    <MenuItem.Header>
+                                        <Canvas Style="{StaticResource CanvasStokeType}">
+                                            <Line Style="{StaticResource LineStokeType}" StrokeDashArray="1"/>
+                                        </Canvas>
+                                    </MenuItem.Header>
+                                </MenuItem>
+                                <MenuItem Tag="Custom 2" Click="MenuStrokeItem_Click">
+                                    <MenuItem.Header>
+                                        <Canvas Style="{StaticResource CanvasStokeType}">
+                                            <Line Style="{StaticResource LineStokeType}" StrokeDashArray="1 3"/>
+                                        </Canvas>
+                                    </MenuItem.Header>
+                                </MenuItem>
+                                <MenuItem Tag="Custom 3" Click="MenuStrokeItem_Click">
+                                    <MenuItem.Header>
+                                        <Canvas Style="{StaticResource CanvasStokeType}">
+                                            <Line Style="{StaticResource LineStokeType}" StrokeDashArray="4 1"/>
+                                        </Canvas>
+                                    </MenuItem.Header>
+                                </MenuItem>
+                                <MenuItem Tag="Custom 4" Click="MenuStrokeItem_Click">
+                                    <MenuItem.Header>
+                                        <Canvas Style="{StaticResource CanvasStokeType}">
+                                            <Line Style="{StaticResource LineStokeType}" StrokeDashArray="4 3"/>
+                                        </Canvas>
+                                    </MenuItem.Header>
+                                </MenuItem>
+                                <MenuItem Tag="Custom 5" Click="MenuStrokeItem_Click">
+                                    <MenuItem.Header>
+                                        <Canvas Style="{StaticResource CanvasStokeType}">
+                                            <Line Style="{StaticResource LineStokeType}" StrokeDashArray="5 2 2 2"/>
+                                        </Canvas>
+                                    </MenuItem.Header>
+                                </MenuItem>
+                                <MenuItem Tag="Custom 6" Click="MenuStrokeItem_Click">
+                                    <MenuItem.Header>
+                                        <Canvas Style="{StaticResource CanvasStokeType}">
+                                            <Line Style="{StaticResource LineStokeType}" StrokeDashArray="5 2 1 1 1 2"/>
+                                        </Canvas>
+                                    </MenuItem.Header>
+                                </MenuItem>
+                            </ContextMenu>
+                        </ui:DropDownButton.ContextMenu>
+                    </ui:DropDownButton>
+
+                    <ui:DropDownButton x:Name="fillTypeList" Width="120" Height="30" Content="Shape fill" PreviewMouseLeftButtonDown="DropDownButton_PreviewMouseLeftButtonDown" Margin="5 0 0 0">
+                        <ui:DropDownButton.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="No fill"/>
+                                <MenuItem Header="Solid fill"/>
+                            </ContextMenu>
+                        </ui:DropDownButton.ContextMenu>
+                    </ui:DropDownButton>
+                </StackPanel>
+               
+                <StackPanel Orientation="Horizontal">
                     <Slider
                         x:Name="thicknessSlider"
-                        Width="80"
+                        Width="200"
                         Margin="8,0,8,0"
                         Maximum="30"
                         Minimum="1"
@@ -176,6 +222,11 @@
                     Icon="{ui:SymbolIcon Layer24}" />
                 <ui:TextBlock Text="Layer" TextAlignment="Center" />
             </StackPanel>
+            <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                <xctk:ColorPicker x:Name="OutlineColorPicker" Height="30" Width="150" SelectedColor="Black"  DisplayColorAndName="True" Margin="0 0 0 10" SelectedColorChanged="OutlineColorPicker_SelectedColorChanged"></xctk:ColorPicker>
+                <xctk:ColorPicker x:Name="FillColorPicker" Height="30" Width="150" SelectedColor="White"  DisplayColorAndName="True" SelectedColorChanged="FillColorPicker1_SelectedColorChanged"></xctk:ColorPicker>
+            </StackPanel>
+
         </StackPanel>
         <Separator />
         <Border Grid.Row="2" Background="LightGray">
