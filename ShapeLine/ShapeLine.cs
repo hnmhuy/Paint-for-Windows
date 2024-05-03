@@ -70,10 +70,7 @@ namespace ShapeLine
                 Y1 = startPoint.Y,
                 X2 = endPoint.X,
                 Y2 = endPoint.Y,
-                //X1 = 0,
-                //Y1 = 0,
-                //X2 = _end.X - _start.X,
-                //Y2 = _end.Y - _start.Y,
+                StrokeDashArray = this.dashArray,
                 StrokeThickness = strokeThickness,
                 Stroke = this._colorStroke,
                 Fill = this._colorFill,
@@ -91,15 +88,17 @@ namespace ShapeLine
                 line.Y1 = startPoint.Y;
                 line.X2 = endPoint.X;
                 line.Y2 = endPoint.Y;
-                //line.X2 = _end.X - _start.X;
-                //line.Y2 = _end.Y - _start.Y;
             }
   
         }
 
         public override void SetDashStroke(DoubleCollection dash)
         {
-            throw new NotImplementedException();
+            this.dashArray = dash;
+            if (line != null)
+            {
+                line.StrokeDashArray = dash;
+            }
         }
 
         public override void SetStrokeColor(SolidColorBrush color)

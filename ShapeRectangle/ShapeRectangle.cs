@@ -31,7 +31,9 @@ namespace ShapeRectangle
                 StrokeThickness = strokeThickness,
                 Stroke = this._colorStroke,
                 Fill = this._colorFill,
+                StrokeDashArray = this.dashArray,
             };
+            
             this._canvas.Children.Add(rectangle);
             return _canvas;
         }
@@ -46,7 +48,11 @@ namespace ShapeRectangle
 
         public override void SetDashStroke(DoubleCollection dash)
         {
-            throw new NotImplementedException();
+            this.dashArray = dash;
+            if (rectangle != null)
+            {
+                rectangle.StrokeDashArray = dash;
+            }
         }
 
         public override void SetStrokeColor(SolidColorBrush color)

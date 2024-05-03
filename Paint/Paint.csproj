@@ -9,23 +9,35 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\Icon\strokedash.png" />
+    <None Remove="Assets\Icon\stroke_dash.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="WPF-UI" Version="3.0.4" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\BaseShapes\BaseShapes.csproj" />
     <ProjectReference Include="..\ShapeEllipse\ShapeEllipse.csproj" />
+    <ProjectReference Include="..\ShapeLeftArrow\ShapeLeftArrow.csproj" />
     <ProjectReference Include="..\ShapeLine\ShapeLine.csproj" />
     <ProjectReference Include="..\ShapeRectangle\ShapeRectangle.csproj" />
+    <ProjectReference Include="..\ShapeRightArrow\ShapeRightArrow.csproj" />
     <ProjectReference Include="..\ShapeStar\ShapeStar.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Assets\Icon\" />
+    <Resource Include="Assets\Icon\strokedash.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
   <ItemGroup>
     <None Update="Assets\Icon\ellipse.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\Icon\left_arrow.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Assets\Icon\line.png">
@@ -34,7 +46,13 @@
     <None Update="Assets\Icon\rectangle.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Assets\Icon\right_arrow.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Assets\Icon\star.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\Icon\stroke_dash.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
