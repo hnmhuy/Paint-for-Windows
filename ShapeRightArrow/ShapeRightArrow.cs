@@ -30,6 +30,7 @@ namespace ShapeRightArrow
             rightArrow.Fill = _colorFill;
             rightArrow.Stroke = _colorStroke;
             rightArrow.StrokeThickness = strokeThickness;
+            rightArrow.StrokeDashArray = this.dashArray;
             rightArrow.Points = CalculateRightArrowPoints(width, height);
 
             _canvas.Children.Add(rightArrow);
@@ -67,7 +68,11 @@ namespace ShapeRightArrow
 
         public override void SetDashStroke(DoubleCollection dash)
         {
-            throw new NotImplementedException();
+            this.dashArray = dash;
+            if (rightArrow != null)
+            {
+                rightArrow.StrokeDashArray = dash;
+            }
         }
 
         public override void SetStrokeColor(SolidColorBrush color)

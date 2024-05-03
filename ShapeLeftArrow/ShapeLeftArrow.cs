@@ -29,7 +29,9 @@ namespace ShapeLeftArrow
             leftArrow.Fill = _colorFill;
             leftArrow.Stroke = _colorStroke;
             leftArrow.StrokeThickness = strokeThickness;
+            leftArrow.StrokeDashArray = this.dashArray;
             leftArrow.Points = CalculateRightArrowPoints(width, height);
+
 
             _canvas.Children.Add(leftArrow);
 
@@ -66,7 +68,11 @@ namespace ShapeLeftArrow
 
         public override void SetDashStroke(DoubleCollection dash)
         {
-            throw new NotImplementedException();
+            this.dashArray = dash;
+            if (leftArrow != null)
+            {
+                leftArrow.StrokeDashArray = dash;
+            }
         }
 
         public override void SetStrokeColor(SolidColorBrush color)

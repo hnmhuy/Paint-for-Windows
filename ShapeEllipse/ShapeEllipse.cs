@@ -1,5 +1,6 @@
 using BaseShapes;
 using System.Drawing;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -29,6 +30,7 @@ namespace ShapeEllipse
                 StrokeThickness = strokeThickness,
                 Fill = this._colorFill,
                 Stroke = this._colorStroke,
+                StrokeDashArray = this.dashArray,
             };
             _canvas.Children.Add(ellipse);
             return _canvas;
@@ -45,7 +47,11 @@ namespace ShapeEllipse
 
         public override void SetDashStroke(DoubleCollection dash)
         {
-            throw new NotImplementedException();
+            this.dashArray = dash;
+            if (ellipse != null)
+            {
+                ellipse.StrokeDashArray = dash;
+            }
         }
 
         public override void SetStrokeColor(SolidColorBrush color)

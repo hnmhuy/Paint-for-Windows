@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace Paint
@@ -43,6 +44,19 @@ namespace Paint
                 thickness = value;
                 OnPropertyChanged(nameof(Thickness));
                 StrokeThicknessChanged();
+            }
+        }
+
+        private DoubleCollection strokeType = new DoubleCollection();
+        public DoubleCollection StrokeType
+        {
+            get { return  strokeType; } 
+            set 
+            {
+                strokeType = value;
+                OnPropertyChanged(nameof(StrokeType));
+                DashStrokeChanged();
+
             }
         }
 
@@ -185,6 +199,14 @@ namespace Paint
             foreach (var item in prototypes)
             {
                 item.SetStrokeThickness(thickness);
+            }
+        }
+
+        private void DashStrokeChanged()
+        {
+            foreach (var item in prototypes)
+            {
+                item.SetDashStroke(strokeType);
             }
         }
 

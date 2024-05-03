@@ -33,6 +33,7 @@ namespace ShapeStar
             star.Fill = _colorFill;
             star.Stroke = _colorStroke;
             star.StrokeThickness = strokeThickness;
+            star.StrokeDashArray = this.dashArray;
             star.Points = CalculateStarPoints(width, height);
             _canvas.Children.Add(star);
 
@@ -74,7 +75,11 @@ namespace ShapeStar
 
         public override void SetDashStroke(DoubleCollection dash)
         {
-            throw new NotImplementedException();
+            this.dashArray = dash;
+            if (star != null)
+            {
+                star.StrokeDashArray = dash;
+            }
         }
 
         public override void SetStrokeColor(SolidColorBrush color)
