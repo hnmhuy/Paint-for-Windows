@@ -73,6 +73,9 @@
         </Style>
 
     </Window.Resources>
+    
+    
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -85,11 +88,13 @@
             Grid.Row="1"
             Style="{StaticResource ActionGroup}">
             <StackPanel Style="{StaticResource ButtonGroup}">
-                <ui:Button
+                <ToggleButton
                     Margin="8"
                     HorizontalAlignment="Center"
+                    x:Name="CopyToClipboard"
+                    Click="CopyToClipboard_Click"
                     FontSize="24"
-                    Icon="{ui:SymbolIcon SelectObject24}" />
+                    Content="{ui:SymbolIcon SelectObject24}" />
                 <ui:TextBlock Text="Selection" TextAlignment="Center" />
             </StackPanel>
 
@@ -234,16 +239,17 @@
                 Margin="0,8,0,8"
                 HorizontalScrollBarVisibility="Auto"
                 VerticalScrollBarVisibility="Auto">
+
                 <Grid
                     x:Name="DrawSpace"
                     Grid.Row="2"
-                    Width="1846"
-                    Height="776"
+                    Width="1024"
+                    Height="720"
                     Margin="8"
                     Background="White"
                     MouseDown="DrawSpace_MouseDown"
                     MouseMove="DrawSpace_MouseMove"
-                    MouseUp="DrawSpace_MouseUp" />
+                    MouseUp="DrawSpace_MouseUp"/>
             </ScrollViewer>
         </Border>
         <Border
