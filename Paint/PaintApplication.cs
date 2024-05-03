@@ -11,8 +11,24 @@ using System.Windows.Media.Imaging;
 
 namespace Paint
 {
+    public enum ToolType
+    {
+        Draw,
+        CopyToClipboard,
+        None
+    }
     public class PaintApplication : INotifyPropertyChanged
     {
+        private ToolType currentTool = ToolType.None;
+        public ToolType CurrentTool
+        {
+            get { return currentTool; }
+            set
+            {
+                currentTool = value;
+                OnPropertyChanged(nameof(CurrentTool));
+            }
+        }
         public event PropertyChangedEventHandler? PropertyChanged;
 
         // Implement INotifyPropertyChanged interface
@@ -70,6 +86,9 @@ namespace Paint
             }
         }
 
+        // Copy to clipboard handler
+        public CopyToClipboardHandler copyToClipboardHandler = CopyToClipboardHandler.Instance;
+
         // Constructor
         public PaintApplication()
         {
@@ -122,14 +141,21 @@ namespace Paint
 
             }
         }
-        public void ShapeControl_Click(object sender, System.Windows.RoutedEventArgs e)
+
+        public void UnselectShape()
         {
             foreach (var item in shapeStack.Children)
             {
                 ((ToggleButton)item).IsChecked = false;
             }
+        }
+
+        public void ShapeControl_Click(object sender, RoutedEventArgs e)
+        {
+            UnselectShape();
             ((ToggleButton)sender).IsChecked = true;
             currPrototype = (BaseShape)((ToggleButton)sender).Tag;
+            CurrentTool = ToolType.Draw;
         }
         public void StartDrawing(Point point)
         {
@@ -159,6 +185,7 @@ namespace Paint
         {
             if (!isDrawing || currPrototype == null) return;
             isDrawing = false;
+            if (initalPoint == currPrototype.End) return;
             currPage.Content.Children.Remove(drawingShape);
             BaseShape generatedShape = (BaseShape)currPrototype.Clone();
             generatedShape.Render();

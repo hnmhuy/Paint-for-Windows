@@ -1,5 +1,11 @@
-﻿using System.Diagnostics;
+﻿using Paint.Commands;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Globalization;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Input;
 
 namespace Paint
@@ -15,6 +21,22 @@ namespace Paint
             InitializeComponent();
             DataContext = application;
             application.GenerateShapeControls(ShapeList);
+            application.PropertyChanged += Application_PropertyChanged;
+        }
+
+        private void Application_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            // Check if the property changed is CurrentTool
+            if (e.PropertyName == nameof(application.CurrentTool))
+            {
+                if (application.CurrentTool == ToolType.CopyToClipboard)
+                {
+                    CopyToClipboard.IsChecked = true;
+                } else
+                {
+                    CopyToClipboard.IsChecked = false;
+                }
+            }
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -24,19 +46,40 @@ namespace Paint
 
         private void DrawSpace_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            application.StartDrawing(e.GetPosition(application.CurrentPage.Content));
+            if(application.CurrentTool == ToolType.Draw)
+            {
+                application.StartDrawing(e.GetPosition(application.CurrentPage.Content));
+            } else if (application.CurrentTool == ToolType.CopyToClipboard)
+            {
+                Canvas canvas = application.CurrentPage.Content;
+                CopyToClipboardHandler.Instance.StartSelecting(e.GetPosition(canvas), canvas);
+            }
+
         }
 
         private void DrawSpace_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            // Checking if the shift button is pressing
-            bool isShift = (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift));
-            application.Drawing(e.GetPosition(application.CurrentPage.Content), isShift);
+            if (application.CurrentTool == ToolType.Draw)
+            {
+                // Checking if the shift button is pressing
+                bool isShift = (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift));
+                application.Drawing(e.GetPosition(application.CurrentPage.Content), isShift);
+            } else if (application.CurrentTool == ToolType.CopyToClipboard)
+            {
+                CopyToClipboardHandler.Instance.UpdateSelecting(e.GetPosition(application.CurrentPage.Content));
+            }   
         }
 
         private void DrawSpace_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            application.DrawComplete();
+            if (application.CurrentTool == ToolType.Draw)
+            {
+                application.DrawComplete();
+            } else if (application.CurrentTool == ToolType.CopyToClipboard)
+            {
+                CopyToClipboardHandler.Instance.IsSelecting = false;
+                CopyToClipboardHandler.Copy(application.CurrentPage.Content);
+            }
         }
 
         private void thicknessSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -55,5 +98,14 @@ namespace Paint
             Debug.WriteLine("Redo");
             application.Redo();
         }
+
+        private void CopyToClipboard_Click(object sender, RoutedEventArgs e)
+        {
+            application.UnselectShape();
+            if (((ToggleButton)sender).IsChecked == true)
+            {
+                application.CurrentTool = ToolType.CopyToClipboard;
+            }
+        } 
     }
 }
