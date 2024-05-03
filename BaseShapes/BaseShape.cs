@@ -92,5 +92,15 @@ namespace BaseShapes
         public abstract void SetStrokeFill(SolidColorBrush fill);
         public abstract void SetStrokeThickness(double thickness);
         public abstract void SetDashStroke(DoubleCollection dash);
+
+        public void AttachClickEventToObject()
+        {
+            Border border = new Border()
+            { 
+                BorderBrush = Brushes.Red,
+                BorderThickness = new Thickness(15),
+            };
+            _canvas.Children.Add(border);
+        }
     }
 }

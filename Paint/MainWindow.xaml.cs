@@ -18,12 +18,14 @@ namespace Paint
     public partial class MainWindow : Window
     {
         private PaintApplication application = new PaintApplication();
+        private bool isFill = false;
         public MainWindow()
         {
             InitializeComponent();
             DataContext = application;
             application.GenerateShapeControls(ShapeList);
             application.PropertyChanged += Application_PropertyChanged;
+            application.FillColor = new SolidColorBrush(Colors.Transparent);
         }
 
         private void Application_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -90,11 +92,15 @@ namespace Paint
         }
         private void DropDownButton_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            // Ensure the left mouse button is clicked
-            if (e.LeftButton == MouseButtonState.Pressed)
+            if (sender == strokeTypeList)
             {
-                // Show the context menu
+                // Show the context menu for strokeTypeList
                 strokeTypeList.ContextMenu.IsOpen = true;
+            }
+            else if (sender == fillTypeList)
+            {
+                // Show the context menu for fillTypeList
+                fillTypeList.ContextMenu.IsOpen = true;
             }
         }
         private void MenuStrokeItem_Click(object sender, RoutedEventArgs e)
@@ -183,9 +189,18 @@ namespace Paint
 
         private void FillColorPicker1_SelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<Color?> e)
         {
-            if (e.NewValue.HasValue)
+            if (isFill == true)
             {
-                Debug.WriteLine(e.NewValue.Value);
+                if (e.NewValue.HasValue)
+                {
+                    application.FillColor = new SolidColorBrush(e.NewValue.Value);
+                    Debug.WriteLine("Fill color: " + e.NewValue.Value);
+                }
+
+            }
+            else
+            {
+                application.FillColor = new SolidColorBrush(Colors.Transparent);
             }
         }
 
@@ -196,6 +211,36 @@ namespace Paint
             {
                 application.CurrentTool = ToolType.CopyToClipboard;
             }
-        } 
+            else
+            {
+                application.CurrentTool = ToolType.None;
+            }
+        }
+
+        private void MenuFillItem_Click(object sender, RoutedEventArgs e)
+        {
+            MenuItem clickedItem = sender as MenuItem;
+            if (clickedItem != null)
+            {
+                string seletedFill = (string)clickedItem.Header;
+                fillTypeList.Content = seletedFill;
+                switch(seletedFill)
+                {
+                    case "No fill":
+                        isFill = false;
+                        application.FillColor = new SolidColorBrush(Colors.Transparent);
+                        break;
+                    case "Solid fill":
+                        isFill = true;
+                        application.FillColor = new SolidColorBrush(FillColorPicker.SelectedColor.Value);
+                        break;
+                    default:
+                        isFill = false;
+                        application.FillColor = new SolidColorBrush(Colors.Transparent);
+                        break;
+                        
+                }
+            }
+        }
     }
 }

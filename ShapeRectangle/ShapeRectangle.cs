@@ -33,10 +33,17 @@ namespace ShapeRectangle
                 Fill = this._colorFill,
                 StrokeDashArray = this.dashArray,
             };
+            rectangle.MouseLeftButtonDown += Rectangle_MouseLeftButtonDown;
             
             this._canvas.Children.Add(rectangle);
             return _canvas;
         }
+
+        private void Rectangle_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            AttachClickEventToObject();
+        }
+
         public override void Resize()
         {
             if (rectangle != null)
@@ -66,7 +73,11 @@ namespace ShapeRectangle
 
         public override void SetStrokeFill(SolidColorBrush fill)
         {
-            throw new NotImplementedException();
+            this._colorFill = fill;
+            if (rectangle != null)
+            {
+                rectangle.Fill = fill;
+            }
         }
 
         public override void SetStrokeThickness(double thickness)
@@ -77,5 +88,6 @@ namespace ShapeRectangle
                 rectangle.StrokeThickness = thickness;
             }
         }
+
     }
 }
