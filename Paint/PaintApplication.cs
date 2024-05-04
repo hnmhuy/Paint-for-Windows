@@ -1,9 +1,11 @@
 ﻿using BaseShapes;
+using Microsoft.Win32;
 using Paint.Commands;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -20,6 +22,16 @@ namespace Paint
     }
     public class PaintApplication : INotifyPropertyChanged
     {
+        private Grid drawSpace;
+        public Grid DrawSpace
+        {
+            get { return drawSpace; }
+            set
+            {
+                drawSpace = value;
+                OnPropertyChanged(nameof(DrawSpace));
+            }
+        }
         private ToolType currentTool = ToolType.None;
         public ToolType CurrentTool
         {
@@ -49,6 +61,7 @@ namespace Paint
         private Paper currPage;
         private Canvas drawingShape;
         public Paper CurrentPage { get { return currPage; } }
+        public List<Type> loadedType = new List<Type>();
 
         // Brush attribute
         private double thickness = 1;
@@ -135,7 +148,9 @@ namespace Paint
                 {
                     if (type.IsClass && (typeof(BaseShape).IsAssignableFrom(type)) && !type.IsAbstract)
                     {
+                        Debug.WriteLine("Got type " + type.Name);
                         prototypes.Add((BaseShape)Activator.CreateInstance(type)!);
+                        loadedType.Add(type);
                     }
                 }
             }
@@ -244,6 +259,7 @@ namespace Paint
         {
             foreach (var item in prototypes)
             {
+               
                 item.SetDashStroke(strokeType);
             }
         }
@@ -267,6 +283,75 @@ namespace Paint
         {
             undoCommand.Undo();
             UpdateHistoryState();
+        }
+
+        // SaveFile file
+        public void SaveFile()
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();   
+            // Filter for this application's file type (*.paint)
+            saveFileDialog.Filter = "Paint files (*.paint)|*.paint";
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                using (BinaryWriter writer = new BinaryWriter(File.Open(saveFileDialog.FileName, FileMode.Create)))
+                {
+                    writer.Write(papers.Count);
+                    foreach (var paper in papers)
+                    {
+                        paper.Save(writer);
+                    }
+                }
+            }
+        }
+
+        // OpenFile file
+        public void OpenFile()
+        {
+            papers.Clear();
+            drawSpace.Children.Clear();
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            // Filter for this application's file type (*.paint)
+            openFileDialog.Filter = "Paint files (*.paint)|*.paint";
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                using (BinaryReader reader = new BinaryReader(File.Open(openFileDialog.FileName, FileMode.Open)))
+                {
+                    int count = reader.ReadInt32();
+                    for (int i = 0; i < count; i++)
+                    {
+                        Paper paper = new Paper();
+                        paper.Load(reader, loadedType);
+                        papers.Add(paper);
+                        drawSpace.Children.Add(paper.Content);
+                    }
+                }
+            }
+
+            currPage = papers[papers.Count - 1];
+        }
+
+        public void NewFile()
+        {
+            papers.Clear();
+            drawSpace.Children.Clear();
+            papers.Add(currPage = new Paper());
+            drawSpace.Children.Add(currPage.Content);
+        }
+
+        public bool IsEmpty()
+        {
+            bool isEmpty = true;
+            foreach (var paper in papers)
+            {
+                if (paper.Content.Children.Count > 0)
+                {
+                    isEmpty = false;
+                    break;
+                }
+            }
+            return isEmpty;
         }
     }
 }

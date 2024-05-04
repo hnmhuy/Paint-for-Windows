@@ -1,5 +1,6 @@
 using BaseShapes;
 using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -14,7 +15,7 @@ namespace ShapeLine
         private Point endPoint;
 
         public ShapeLine() { 
-            _name= "Line";
+            _name= nameof(ShapeLine);
             _iconName = "line.png";
         }
         public override object Clone()
@@ -122,6 +123,23 @@ namespace ShapeLine
             {
                 line.StrokeThickness = thickness;
             }
+        }
+
+        public override void Save(BinaryWriter writer)
+        {
+            base.Save(writer);
+            writer.Write(startPoint.X);
+            writer.Write(startPoint.Y);
+            writer.Write(endPoint.X);
+            writer.Write(endPoint.Y);
+
+        }
+
+        public override void Load(BinaryReader reader)
+        {
+            base.Load(reader);
+            startPoint = new Point(reader.ReadDouble(), reader.ReadDouble());
+            endPoint = new Point(reader.ReadDouble(), reader.ReadDouble());
         }
     }
 

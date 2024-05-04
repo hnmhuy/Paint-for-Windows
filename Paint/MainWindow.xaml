@@ -73,9 +73,7 @@
         </Style>
 
     </Window.Resources>
-    
-    
-    
+   
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -259,8 +257,9 @@
             <Menu x:Name="TopBar">
                 <MenuItem Header="File">
                     <MenuItem Header="New" />
-                    <MenuItem Header="Open..." />
-                    <MenuItem Header="Save" />
+                    <MenuItem Header="Open..." Name="OpenFile" Click="OpenFile_Click" />
+                    <MenuItem Header="Save" Name="SaveFile" Click="SaveFile_Click" />
+                    <MenuItem Header="Clear all" Name="ClearAll" Click="ClearAll_Click"/>
                     <Separator />
                     <MenuItem Header="Exit" />
                 </MenuItem>

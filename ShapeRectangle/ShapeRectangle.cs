@@ -12,7 +12,7 @@ namespace ShapeRectangle
 
         public ShapeRectangle()
         {
-            _name = "Rectangle";
+            _name = nameof(ShapeRectangle);
             _iconName = "rectangle.png";
         }
 

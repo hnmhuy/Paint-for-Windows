@@ -12,7 +12,7 @@ namespace ShapeEllipse
     {
         private Ellipse ellipse;
         public ShapeEllipse() {
-            _name = "Ellipse";
+            _name = nameof(ShapeEllipse);
             _iconName = "ellipse.png";
 
         }

@@ -1,4 +1,5 @@
 ﻿using BaseShapes;
+using System.IO;
 using System.Windows.Controls;
 
 namespace Paint
@@ -7,7 +8,7 @@ namespace Paint
     {
         private Canvas _content;
         private List<BaseShape> drawnShapes = new List<BaseShape>();
-
+        public List<BaseShape> DrawnShapes { get { return drawnShapes; } }
         public Canvas Content { get { return _content; } }
 
         public Paper()
@@ -27,6 +28,48 @@ namespace Paint
         {
             drawnShapes.Remove(shape);
             _content.Children.Remove(shape.content);
+        }
+
+        public void Save(BinaryWriter binaryWriter)
+        {
+            binaryWriter.Write(drawnShapes.Count);
+            foreach (var shape in drawnShapes)
+            {
+                binaryWriter.Write(shape.Name);
+                shape.Save(binaryWriter);
+            }
+        }
+
+        public void Load(BinaryReader binaryReader, List<Type> types)
+        {
+            int count = binaryReader.ReadInt32();
+            for (int i = 0; i < count; i++)
+            {
+                String name = binaryReader.ReadString();
+                BaseShape shape = ShapeFactory.CreateShape(types, name, binaryReader);
+                if (shape!= null)
+                {
+                    shape.Render();
+                    AddShape(shape);
+                }
+            }
+        }
+
+        public void Clear()
+        {
+            drawnShapes.Clear();
+            _content.Children.Clear();
+        }
+
+        public void RenderAll()
+        {
+            foreach (var shape in drawnShapes)
+            {
+                var content = shape.Render();
+                _content.Children.Add(content);
+                Canvas.SetTop(content, shape.Start.Y);
+                Canvas.SetLeft(content, shape.Start.X);
+            }
         }
     }
 }

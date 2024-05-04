@@ -11,7 +11,7 @@ namespace ShapeRightArrow
         private Polygon rightArrow;
         public ShapeRightArrow()
         {
-            _name = "RightArrow";
+            _name = nameof(ShapeRightArrow);
             _iconName = "right_arrow.png";
         }
         public override object Clone()

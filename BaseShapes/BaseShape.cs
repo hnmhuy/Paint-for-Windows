@@ -1,4 +1,5 @@
 ﻿
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -16,7 +17,7 @@ namespace BaseShapes
         protected SolidColorBrush _colorFill;
         protected double strokeThickness;
         protected DoubleCollection dashArray;
-        protected bool isDashStroke = false;
+        protected bool isDashStroke = true;
 
         public BaseShape()
         {
@@ -26,6 +27,7 @@ namespace BaseShapes
             _colorStroke = new SolidColorBrush(Colors.Black);
             _colorFill = new SolidColorBrush(Colors.Transparent);
         }
+
         public String IconName { get { return _iconName; } }
         public String Name { get { return _name; } }
         public Canvas content { get { return _canvas; } }
@@ -92,5 +94,49 @@ namespace BaseShapes
         public abstract void SetStrokeFill(SolidColorBrush fill);
         public abstract void SetStrokeThickness(double thickness);
         public abstract void SetDashStroke(DoubleCollection dash);
+
+        // Save the shape to a file
+        public virtual void Save(BinaryWriter writer)
+        {
+            writer.Write(_start.X);
+            writer.Write(_start.Y);
+            writer.Write(_end.X);
+            writer.Write(_end.Y);
+            writer.Write(_colorStroke.Color.ToString());
+            writer.Write(_colorFill.Color.ToString());
+            writer.Write(strokeThickness);
+            isDashStroke = dashArray != null;
+            writer.Write(isDashStroke);
+            if (dashArray!=null)
+            {
+                writer.Write(dashArray.Count);
+                foreach (double dash in dashArray)
+                {
+                    writer.Write(dash);
+                }
+            }
+        }
+
+        // Loading shapes from file
+        public virtual void Load(BinaryReader reader)
+        {
+            _start = new Point(reader.ReadDouble(), reader.ReadDouble());
+            _end = new Point(reader.ReadDouble(), reader.ReadDouble());
+            _colorStroke = new SolidColorBrush((Color)ColorConverter.ConvertFromString(reader.ReadString()));
+            _colorFill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(reader.ReadString()));
+            strokeThickness = reader.ReadDouble();
+            isDashStroke = reader.ReadBoolean();
+            if (isDashStroke)
+            {
+                int count = reader.ReadInt32();
+                dashArray = new DoubleCollection();
+                for (int i = 0; i < count; i++)
+                {
+                    dashArray.Add(reader.ReadDouble());
+                }
+            }
+        }
+
+
     }
 }

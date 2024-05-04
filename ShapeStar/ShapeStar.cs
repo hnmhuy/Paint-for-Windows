@@ -13,7 +13,7 @@ namespace ShapeStar
         private Polygon star;
         public ShapeStar()
         {
-            _name = "Star";
+            _name = nameof(ShapeStar);
             _iconName = "star.png";
         }
 

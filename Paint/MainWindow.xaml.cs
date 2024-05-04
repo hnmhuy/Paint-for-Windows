@@ -1,11 +1,9 @@
 ﻿using Paint.Commands;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -43,6 +41,7 @@ namespace Paint
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            application.DrawSpace = DrawSpace;
             DrawSpace.Children.Add(application.CurrentPage.Content);
         }
 
@@ -196,6 +195,30 @@ namespace Paint
             {
                 application.CurrentTool = ToolType.CopyToClipboard;
             }
-        } 
+        }
+
+        private void SaveFile_Click(object sender, RoutedEventArgs e)
+        {
+            application.SaveFile();
+        }
+
+        private void OpenFile_Click(object sender, RoutedEventArgs e)
+        {
+            application.OpenFile();
+        }
+
+        private void ClearAll_Click(object sender, RoutedEventArgs e)
+        {
+            if (!application.IsEmpty())
+            {
+                // Ask for comfirmation
+                MessageBoxResult result = MessageBox.Show("Are you sure you want to clear all?", "Confirmation", MessageBoxButton.YesNo);
+                if (result == MessageBoxResult.Yes)
+                {
+                    application.NewFile();
+                }
+            }
+            else return;
+        }
     }
 }
