@@ -76,6 +76,9 @@ namespace Paint
             else if (application.CurrentTool == ToolType.CopyToClipboard)
             {
                 CopyToClipboardHandler.Instance.UpdateSelecting(e.GetPosition(application.CurrentPage.Content));
+            } else if (application.CurrentTool == ToolType.MovingShape)
+            {
+                application.OnMovingShape(e.GetPosition(application.CurrentPage.Content));
             }
         }
 
@@ -89,6 +92,9 @@ namespace Paint
             {
                 CopyToClipboardHandler.Instance.IsSelecting = false;
                 CopyToClipboardHandler.Copy(application.MainPage);
+            } else if (application.CurrentTool == ToolType.MovingShape)
+            {
+                application.OnMovingShapeComplete(e.GetPosition(application.MainPage));
             }
         }
 

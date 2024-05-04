@@ -8,6 +8,7 @@ namespace BaseShapes
     {
         private static double pointRadius = 10;
         private static Canvas border = new Canvas() { AllowDrop = false, Width = 0, Height = 0, Background = Brushes.Transparent, };
+        public static Canvas Border { get { return border; } }
         private static Ellipse[] points = new Ellipse[9];
         private static ShapeSelector instance = new ShapeSelector();
         public static ShapeSelector Instance { get { return instance; } }
@@ -77,7 +78,7 @@ namespace BaseShapes
         }
 
         private BaseShape selectedShape;
-        public BaseShape SelectedShape { get { return selectedShape; } }
+        public BaseShape SelectedShape { get { return selectedShape; } set { selectedShape = value; } }
 
         public void SelectShape(BaseShape shape)
         {

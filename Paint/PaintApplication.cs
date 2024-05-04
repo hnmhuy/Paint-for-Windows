@@ -21,6 +21,7 @@ namespace Paint
         Draw,
         CopyToClipboard,
         Select,
+        MovingShape,
         None
     }
     public class PaintApplication : INotifyPropertyChanged
@@ -68,6 +69,8 @@ namespace Paint
         private Canvas mainPage = new Canvas();
         public Canvas MainPage { get { return mainPage; } }
         public ShapeSelector selector = ShapeSelector.Instance; 
+
+
 
         // Brush attribute
         private double thickness = 1;
@@ -151,6 +154,7 @@ namespace Paint
             LoadPrototypes();
             papers.Add(currPage = new Paper(mainPage));
             undoCommand = new UndoCommand(commandHistory);
+            SelectorMouseHandler();
         }
         private void Canvas_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
@@ -419,7 +423,53 @@ namespace Paint
             }
         }
 
+        public void SelectorMouseHandler()
+        {
+            Canvas bounder = ShapeSelector.Border;
+            Rectangle? rect = bounder.Children[0] as Rectangle;
+            Cursor currCursor = Mouse.OverrideCursor;
+            
+            if (rect!=null)
+            {
+                rect.MouseEnter += (sender, e) =>
+                {
+                    if (currCursor != Mouse.OverrideCursor)
+                    {
+                        currCursor = Mouse.OverrideCursor;
+                    }
+                    Mouse.OverrideCursor = Cursors.SizeAll;
+                };
 
+                rect.MouseLeave += (sender, e) =>
+                {
+                    Mouse.OverrideCursor = currCursor;
+                };
 
+                rect.MouseDown += (sender, e) =>
+                {
+                    selector.SelectedShape.content.Opacity = 0.8;
+                    initalPoint = e.GetPosition(mainPage);
+                    currentTool = ToolType.MovingShape;
+                };
+            }
+        }
+
+        public void OnMovingShape(Point end)
+        {
+            double deltaX = end.X - initalPoint.X;
+            double deltaY = end.Y - initalPoint.Y;
+            selector.SelectedShape.content.SetValue(Canvas.LeftProperty, selector.SelectedShape.Start.X + deltaX);
+            selector.SelectedShape.content.SetValue(Canvas.TopProperty, selector.SelectedShape.Start.Y + deltaY);
+        }
+
+        public void OnMovingShapeComplete(Point newPoint)
+        {
+            selector.SelectedShape.content.Opacity = 1;            
+            currentTool = ToolType.Select;
+            double deltaX = newPoint.X - initalPoint.X;
+            double deltaY = newPoint.Y - initalPoint.Y;
+            ShapeMoveCommand command = new ShapeMoveCommand(selector.SelectedShape, new Point(deltaX, deltaY), currPage, selector);
+            ExecuteCommand(command);
+        }
     }
 }

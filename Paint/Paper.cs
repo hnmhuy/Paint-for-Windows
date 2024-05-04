@@ -79,5 +79,16 @@ namespace Paint
                 shape.CanSelect = isSelect;
             }
         }
+
+        public void Replace(BaseShape oldShape, BaseShape newShape)
+        {
+            int index = drawnShapes.IndexOf(oldShape);
+            if (index != -1)
+            {
+                drawnShapes[index] = newShape;
+                //_content.Children.Remove(oldShape.content);
+                //_content.Children.Add(newShape.content);
+            }
+        }
     }
 }

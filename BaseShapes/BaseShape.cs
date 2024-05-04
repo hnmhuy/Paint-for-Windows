@@ -167,5 +167,16 @@ namespace BaseShapes
                 selector.SelectShape(this);
             };
         }
+
+        public void Move(Point movingDistance)
+        {
+            _start.X += movingDistance.X;
+            _start.Y += movingDistance.Y;
+            _end.X += movingDistance.X;
+            _end.Y += movingDistance.Y;
+
+            _canvas.SetValue(Canvas.LeftProperty, _start.X);
+            _canvas.SetValue(Canvas.TopProperty, _start.Y);
+        }
     }
 }
