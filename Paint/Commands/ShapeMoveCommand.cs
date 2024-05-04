@@ -16,31 +16,29 @@ namespace Paint.Commands
         private Paper receiver;
         private BaseShape newShape;
         private ShapeSelector selector; 
+        public  BaseShape NewShape { get { return newShape; } }
 
-        public ShapeMoveCommand(BaseShape shape, Point movingDistance, Paper receiver, ShapeSelector selector)
+        public ShapeMoveCommand(ShapeSelector selector, Point movingDistance, Paper receiver)
         {
-            this.backup = shape;
+            this.selector = selector;
+            this.backup = selector.SelectedShape;
             this.movingDistance = movingDistance;
             this.receiver = receiver;
-            this.selector = selector;
         }   
 
         public override void Execute()
         {
             newShape = (BaseShape)this.backup.Clone();
-            newShape.Move(movingDistance);
-            receiver.Replace(this.backup, newShape);
-            selector.SelectedShape = newShape;
+            newShape.Render();
+            newShape.Move(movingDistance);         
+            receiver.Replace(this.backup, newShape);   
+            selector.SelectShape(newShape);
         }
 
         public override void Undo()
         {
-            receiver.Replace(this.newShape, this.backup);
-            Canvas content = newShape.content;
-            Canvas.SetTop(content, this.backup.Start.Y);
-            Canvas.SetLeft(content, this.backup.Start.X);
-
-            selector.SelectedShape = this.backup;
+            receiver.Replace(newShape, this.backup);
+            selector.SelectShape(this.backup);
         }
     }
 }

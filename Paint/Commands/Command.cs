@@ -7,5 +7,6 @@ namespace Paint.Commands
         protected BaseShape backup;
         public abstract void Execute();
         public abstract void Undo();
+        public BaseShape Backup { get { return backup; } }
     }
 }

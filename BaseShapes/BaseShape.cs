@@ -1,4 +1,5 @@
 ﻿
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -165,6 +166,7 @@ namespace BaseShapes
             element.MouseDown += (sender, e) =>
             {
                 selector.SelectShape(this);
+                Debug.WriteLine("Change selected shape: " + this.Start.X + ";" + this.Start.Y);
             };
         }
 
@@ -175,8 +177,8 @@ namespace BaseShapes
             _end.X += movingDistance.X;
             _end.Y += movingDistance.Y;
 
-            _canvas.SetValue(Canvas.LeftProperty, _start.X);
-            _canvas.SetValue(Canvas.TopProperty, _start.Y);
+            Canvas.SetTop(_canvas, _start.Y);
+            Canvas.SetLeft(_canvas, _start.X);
         }
     }
 }

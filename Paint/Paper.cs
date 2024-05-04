@@ -85,9 +85,16 @@ namespace Paint
             int index = drawnShapes.IndexOf(oldShape);
             if (index != -1)
             {
-                drawnShapes[index] = newShape;
-                //_content.Children.Remove(oldShape.content);
-                //_content.Children.Add(newShape.content);
+                // Remove the old shape
+                drawnShapes.Remove(oldShape);
+                // Find the index of the old shape in the content
+                int contentIndex = _content.Children.IndexOf(oldShape.content);
+                // Remove the old shape from the content
+                _content.Children.Remove(oldShape.content);
+                // Add the new shape to the content
+                _content.Children.Insert(contentIndex, newShape.content);
+                // Add the new shape to the list
+                drawnShapes.Insert(index, newShape);
             }
         }
     }

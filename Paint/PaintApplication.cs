@@ -457,7 +457,7 @@ namespace Paint
         public void OnMovingShape(Point end)
         {
             double deltaX = end.X - initalPoint.X;
-            double deltaY = end.Y - initalPoint.Y;
+            double deltaY = end.Y - initalPoint.Y;           
             selector.SelectedShape.content.SetValue(Canvas.LeftProperty, selector.SelectedShape.Start.X + deltaX);
             selector.SelectedShape.content.SetValue(Canvas.TopProperty, selector.SelectedShape.Start.Y + deltaY);
         }
@@ -468,7 +468,7 @@ namespace Paint
             currentTool = ToolType.Select;
             double deltaX = newPoint.X - initalPoint.X;
             double deltaY = newPoint.Y - initalPoint.Y;
-            ShapeMoveCommand command = new ShapeMoveCommand(selector.SelectedShape, new Point(deltaX, deltaY), currPage, selector);
+            ShapeMoveCommand command = new ShapeMoveCommand(selector, new Point(deltaX, deltaY), currPage);
             ExecuteCommand(command);
         }
     }

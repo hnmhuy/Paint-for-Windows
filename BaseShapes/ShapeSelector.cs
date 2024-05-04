@@ -78,7 +78,7 @@ namespace BaseShapes
         }
 
         private BaseShape selectedShape;
-        public BaseShape SelectedShape { get { return selectedShape; } set { selectedShape = value; } }
+        public BaseShape SelectedShape { get { return selectedShape; } }
 
         public void SelectShape(BaseShape shape)
         {
