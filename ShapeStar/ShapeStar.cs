@@ -93,7 +93,11 @@ namespace ShapeStar
 
         public override void SetStrokeFill(SolidColorBrush fill)
         {
-            throw new NotImplementedException();
+            this._colorFill = fill;
+            if (star != null)
+            {
+                star.Fill = fill;
+            }
         }
 
         public override void SetStrokeThickness(double thickness)

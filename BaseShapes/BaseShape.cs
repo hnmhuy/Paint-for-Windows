@@ -138,5 +138,15 @@ namespace BaseShapes
         }
 
 
+
+        public void AttachClickEventToObject()
+        {
+            Border border = new Border()
+            { 
+                BorderBrush = Brushes.Red,
+                BorderThickness = new Thickness(15),
+            };
+            _canvas.Children.Add(border);
+        }
     }
 }

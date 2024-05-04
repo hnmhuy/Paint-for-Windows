@@ -193,8 +193,8 @@
                     <ui:DropDownButton x:Name="fillTypeList" Width="120" Height="30" Content="Shape fill" PreviewMouseLeftButtonDown="DropDownButton_PreviewMouseLeftButtonDown" Margin="5 0 0 0">
                         <ui:DropDownButton.ContextMenu>
                             <ContextMenu>
-                                <MenuItem Header="No fill"/>
-                                <MenuItem Header="Solid fill"/>
+                                <MenuItem Header="No fill" Click="MenuFillItem_Click"/>
+                                <MenuItem Header="Solid fill" Click="MenuFillItem_Click"/>
                             </ContextMenu>
                         </ui:DropDownButton.ContextMenu>
                     </ui:DropDownButton>
@@ -241,8 +241,8 @@
                 <Grid
                     x:Name="DrawSpace"
                     Grid.Row="2"
-                    Width="1024"
-                    Height="720"
+                    Width="1846"
+                    Height="776"
                     Margin="8"
                     Background="White"
                     MouseDown="DrawSpace_MouseDown"

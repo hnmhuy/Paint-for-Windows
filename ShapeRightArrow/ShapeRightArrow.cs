@@ -86,7 +86,11 @@ namespace ShapeRightArrow
 
         public override void SetStrokeFill(SolidColorBrush fill)
         {
-            throw new NotImplementedException();
+            this._colorFill = fill;
+            if (rightArrow != null)
+            {
+                rightArrow.Fill = fill;
+            }
         }
 
         public override void SetStrokeThickness(double thickness)

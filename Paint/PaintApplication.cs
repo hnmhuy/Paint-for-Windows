@@ -9,8 +9,10 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
 
 namespace Paint
 {
@@ -100,6 +102,18 @@ namespace Paint
                 ColorStrokeChanged();
             }
         }
+        private SolidColorBrush fillColor = Brushes.Transparent;
+        public SolidColorBrush FillColor
+        {
+            get { return fillColor; }
+            set
+            {
+                fillColor = value;
+                OnPropertyChanged(nameof(FillColor));
+                ColorFillChanged();
+            }
+        }
+
         // Control attribute
         private CommandHistory commandHistory = new CommandHistory();
         private UndoCommand undoCommand;
@@ -133,6 +147,33 @@ namespace Paint
             LoadPrototypes();
             papers.Add(currPage = new Paper());
             undoCommand = new UndoCommand(commandHistory);
+        }
+        private void Canvas_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            // Identify the clicked canvas
+            Canvas clickedCanvas = sender as Canvas;
+            if (clickedCanvas != null)
+            {
+                // Perform actions based on the clicked canvas
+                Debug.WriteLine("Canvas double-clicked: " + clickedCanvas.Name);
+
+                // For example, you can get the shape associated with this canvas and change its stroke color
+                ChangeStrokeColor(clickedCanvas, Brushes.Red);
+            }
+        }
+        private void ChangeStrokeColor(Canvas canvas, SolidColorBrush newStrokeColor)
+        {
+            foreach (UIElement element in canvas.Children)
+            {
+                if (element is Shape shape)
+                {
+                    // Check if the shape has a Stroke property (e.g., Rectangle, Ellipse, etc.)
+                    if (shape.Stroke != null)
+                    {
+                        shape.Stroke = newStrokeColor;
+                    }
+                }
+            }
         }
 
         private void LoadPrototypes()
@@ -272,6 +313,13 @@ namespace Paint
             }
         }
 
+        private void ColorFillChanged()
+        {
+            foreach (var item in prototypes)
+            {
+                item.SetStrokeFill(fillColor);
+            }
+        }
 
         public void Undo()
         {
