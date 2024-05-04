@@ -22,6 +22,7 @@ namespace Paint
         CopyToClipboard,
         Select,
         MovingShape,
+        AddText,
         None
     }
     public class PaintApplication : INotifyPropertyChanged
@@ -423,6 +424,16 @@ namespace Paint
             }
         }
 
+        public void ChangeToAddTextMode(bool isAddingText)
+        {
+            CurrentTool = isAddingText ? ToolType.AddText : ToolType.None;
+            foreach (var page in papers)
+            {
+                page.ChangeToAddText(isAddingText);
+            }
+
+        }
+
         public void SelectorMouseHandler()
         {
             Canvas bounder = ShapeSelector.Border;
@@ -433,13 +444,20 @@ namespace Paint
             {
                 rect.MouseEnter += (sender, e) =>
                 {
-                    if (currCursor != Mouse.OverrideCursor)
+                    if(currentTool != ToolType.AddText)
                     {
-                        currCursor = Mouse.OverrideCursor;
+                        if (currCursor != Mouse.OverrideCursor)
+                        {
+                            currCursor = Mouse.OverrideCursor;
+                        }
+                        Mouse.OverrideCursor = Cursors.SizeAll;
                     }
-                    Mouse.OverrideCursor = Cursors.SizeAll;
+                    else
+                    {
+                        Mouse.OverrideCursor = Cursors.IBeam;
+                    }    
+                  
                 };
-
                 rect.MouseLeave += (sender, e) =>
                 {
                     Mouse.OverrideCursor = currCursor;
@@ -447,11 +465,34 @@ namespace Paint
 
                 rect.MouseDown += (sender, e) =>
                 {
-                    selector.SelectedShape.content.Opacity = 0.8;
-                    initalPoint = e.GetPosition(mainPage);
-                    currentTool = ToolType.MovingShape;
+                    if(currentTool != ToolType.AddText)
+                    {
+                        selector.SelectedShape.content.Opacity = 0.8;
+                        initalPoint = e.GetPosition(mainPage);
+                        currentTool = ToolType.MovingShape;
+                    }
+                    else
+                    {
+                        currentTool = ToolType.AddText;
+                        onAddingText();
+                    }    
+                };
+                rect.MouseMove += (sender, e) =>
+                {
+                    if (currentTool == ToolType.AddText)
+                    {
+                        Mouse.OverrideCursor = Cursors.IBeam;
+                    }
+
                 };
             }
+        }
+
+        public void onAddingText()
+        {
+            TextBlock textBlock = new TextBlock();
+            textBlock.Text = "hahah";
+            selector.SelectedShape.content.Children.Add(textBlock);
         }
 
         public void OnMovingShape(Point end)

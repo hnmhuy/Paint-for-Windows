@@ -241,6 +241,19 @@
                 <xctk:ColorPicker x:Name="FillColorPicker" Height="30" Width="150" SelectedColor="White"  DisplayColorAndName="True" SelectedColorChanged="FillColorPicker1_SelectedColorChanged"></xctk:ColorPicker>
             </StackPanel>
 
+            <StackPanel Orientation="Vertical">
+                <ToggleButton
+                    Margin="8"
+                    HorizontalAlignment="Center"
+                    x:Name="AddTextButton"
+                    ToolTip="Text"
+                    Click="AddTextButton_Click"
+                    FontSize="24"
+                    IsEnabled="False"
+                    Content="{ui:SymbolIcon TextColor24}" />
+                <ui:TextBlock Text="Text" TextAlignment="Center" />
+            </StackPanel>
+
         </StackPanel>
         <Separator />
         <Border Grid.Row="2" Background="LightGray">
