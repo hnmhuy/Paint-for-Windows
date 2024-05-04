@@ -20,6 +20,7 @@ namespace Paint
     {
         Draw,
         CopyToClipboard,
+        Select,
         None
     }
     public class PaintApplication : INotifyPropertyChanged
@@ -64,6 +65,9 @@ namespace Paint
         private Canvas drawingShape;
         public Paper CurrentPage { get { return currPage; } }
         public List<Type> loadedType = new List<Type>();
+        private Canvas mainPage = new Canvas();
+        public Canvas MainPage { get { return mainPage; } }
+        public ShapeSelector selector = ShapeSelector.Instance; 
 
         // Brush attribute
         private double thickness = 1;
@@ -145,7 +149,7 @@ namespace Paint
         public PaintApplication()
         {
             LoadPrototypes();
-            papers.Add(currPage = new Paper());
+            papers.Add(currPage = new Paper(mainPage));
             undoCommand = new UndoCommand(commandHistory);
         }
         private void Canvas_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -190,7 +194,9 @@ namespace Paint
                     if (type.IsClass && (typeof(BaseShape).IsAssignableFrom(type)) && !type.IsAbstract)
                     {
                         Debug.WriteLine("Got type " + type.Name);
-                        prototypes.Add((BaseShape)Activator.CreateInstance(type)!);
+                        BaseShape shape = (BaseShape)Activator.CreateInstance(type)!;
+                        shape.Selector = selector;
+                        prototypes.Add(shape);
                         loadedType.Add(type);
                     }
                 }
@@ -358,6 +364,7 @@ namespace Paint
         {
             papers.Clear();
             drawSpace.Children.Clear();
+            mainPage.Children.Clear();
             OpenFileDialog openFileDialog = new OpenFileDialog();
             // Filter for this application's file type (*.paint)
             openFileDialog.Filter = "Paint files (*.paint)|*.paint";
@@ -369,7 +376,7 @@ namespace Paint
                     int count = reader.ReadInt32();
                     for (int i = 0; i < count; i++)
                     {
-                        Paper paper = new Paper();
+                        Paper paper = new Paper(mainPage);
                         paper.Load(reader, loadedType);
                         papers.Add(paper);
                         drawSpace.Children.Add(paper.Content);
@@ -383,9 +390,10 @@ namespace Paint
         public void NewFile()
         {
             papers.Clear();
+            mainPage.Children.Clear();
             drawSpace.Children.Clear();
-            papers.Add(currPage = new Paper());
-            drawSpace.Children.Add(currPage.Content);
+            papers.Add(currPage = new Paper(mainPage));
+            drawSpace.Children.Add(mainPage);
         }
 
         public bool IsEmpty()
@@ -401,5 +409,17 @@ namespace Paint
             }
             return isEmpty;
         }
+
+        public void ChangeToSelectingMode(bool isSelecting)
+        {
+            CurrentTool = isSelecting ? ToolType.Select : ToolType.None;
+            foreach(var page in papers)
+            {
+                page.ChangeToSelect(isSelecting);
+            }
+        }
+
+
+
     }
 }

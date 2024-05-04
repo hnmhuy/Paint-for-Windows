@@ -1,4 +1,5 @@
 ﻿using Paint.Commands;
+using ShapeLine;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
@@ -10,9 +11,6 @@ using System.Windows.Shapes;
 
 namespace Paint
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         private PaintApplication application = new PaintApplication();
@@ -34,8 +32,14 @@ namespace Paint
                 if (application.CurrentTool == ToolType.CopyToClipboard)
                 {
                     CopyToClipboard.IsChecked = true;
-                } else
+                }
+                else if (application.CurrentTool == ToolType.Select)
                 {
+                    SingleShapeSelector.IsChecked = true;
+                }
+                else
+                {
+                    SingleShapeSelector.IsChecked = false;
                     CopyToClipboard.IsChecked = false;
                 }
             }
@@ -44,15 +48,16 @@ namespace Paint
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             application.DrawSpace = DrawSpace;
-            DrawSpace.Children.Add(application.CurrentPage.Content);
+            DrawSpace.Children.Add(application.MainPage);
         }
 
         private void DrawSpace_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            if(application.CurrentTool == ToolType.Draw)
+            if (application.CurrentTool == ToolType.Draw)
             {
                 application.StartDrawing(e.GetPosition(application.CurrentPage.Content));
-            } else if (application.CurrentTool == ToolType.CopyToClipboard)
+            }
+            else if (application.CurrentTool == ToolType.CopyToClipboard)
             {
                 Canvas canvas = application.CurrentPage.Content;
                 CopyToClipboardHandler.Instance.StartSelecting(e.GetPosition(canvas), canvas);
@@ -67,10 +72,11 @@ namespace Paint
                 // Checking if the shift button is pressing
                 bool isShift = (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift));
                 application.Drawing(e.GetPosition(application.CurrentPage.Content), isShift);
-            } else if (application.CurrentTool == ToolType.CopyToClipboard)
+            }
+            else if (application.CurrentTool == ToolType.CopyToClipboard)
             {
                 CopyToClipboardHandler.Instance.UpdateSelecting(e.GetPosition(application.CurrentPage.Content));
-            }   
+            }
         }
 
         private void DrawSpace_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -78,10 +84,11 @@ namespace Paint
             if (application.CurrentTool == ToolType.Draw)
             {
                 application.DrawComplete();
-            } else if (application.CurrentTool == ToolType.CopyToClipboard)
+            }
+            else if (application.CurrentTool == ToolType.CopyToClipboard)
             {
                 CopyToClipboardHandler.Instance.IsSelecting = false;
-                CopyToClipboardHandler.Copy(application.CurrentPage.Content);
+                CopyToClipboardHandler.Copy(application.MainPage);
             }
         }
 
@@ -129,15 +136,15 @@ namespace Paint
                 Stroke = Brushes.Black,
                 StrokeThickness = 2,
             };
- 
+
             // Set the StrokeDashArray property based on tagValue
             switch (tagValue)
             {
                 case "Custom 0":
-                    line.StrokeDashArray = new DoubleCollection() {};
+                    line.StrokeDashArray = new DoubleCollection() { };
                     break;
                 case "Custom 1":
-                    line.StrokeDashArray = new DoubleCollection() { 1};
+                    line.StrokeDashArray = new DoubleCollection() { 1 };
                     break;
                 case "Custom 2":
                     line.StrokeDashArray = new DoubleCollection() { 1, 3 };
@@ -178,7 +185,7 @@ namespace Paint
 
         private void OutlineColorPicker_SelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<Color?> e)
         {
-            if(e.NewValue.HasValue)
+            if (e.NewValue.HasValue)
             {
                 application.StrokeColor = new SolidColorBrush(e.NewValue.Value);
                 Debug.WriteLine("Outline color: " + e.NewValue.Value);
@@ -223,7 +230,7 @@ namespace Paint
             {
                 string seletedFill = (string)clickedItem.Header;
                 fillTypeList.Content = seletedFill;
-                switch(seletedFill)
+                switch (seletedFill)
                 {
                     case "No fill":
                         isFill = false;
@@ -237,7 +244,7 @@ namespace Paint
                         isFill = false;
                         application.FillColor = new SolidColorBrush(Colors.Transparent);
                         break;
-                        
+
                 }
             }
         }
@@ -264,6 +271,36 @@ namespace Paint
                 }
             }
             else return;
+        }
+
+        private void DrawSpace_MouseEnter(object sender, MouseEventArgs e)
+        {
+            // Change the cursor depending on the current tool
+            ToolType currentTool = application.CurrentTool;
+            if (currentTool == ToolType.None)
+            {
+                Cursor = Cursors.Arrow;
+            }
+            else if (currentTool == ToolType.Draw)
+            {
+                Cursor = Cursors.Pen;
+            }
+            else if (currentTool == ToolType.CopyToClipboard)
+            {
+                Cursor = Cursors.Cross;
+            }
+        }
+
+        private void DrawSpace_MouseLeave(object sender, MouseEventArgs e)
+        {
+            Cursor = Cursors.Arrow;
+        }
+
+        private void SingleShapeSelector_Click(object sender, RoutedEventArgs e)
+        {
+            application.UnselectShape();
+            CopyToClipboard.IsChecked = false;
+            application.ChangeToSelectingMode((bool)SingleShapeSelector.IsChecked);
         }
     }
 }

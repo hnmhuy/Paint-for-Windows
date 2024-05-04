@@ -32,16 +32,11 @@ namespace ShapeRectangle
                 Stroke = this._colorStroke,
                 Fill = this._colorFill,
                 StrokeDashArray = this.dashArray,
+                Margin = new System.Windows.Thickness(padding),
             };
-            rectangle.MouseLeftButtonDown += Rectangle_MouseLeftButtonDown;
-            
+            base.AttachEventHandler(rectangle);
             this._canvas.Children.Add(rectangle);
             return _canvas;
-        }
-
-        private void Rectangle_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            AttachClickEventToObject();
         }
 
         public override void Resize()

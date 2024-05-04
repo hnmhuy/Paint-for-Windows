@@ -3,10 +3,10 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:Paint"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+    xmlns:local="clr-namespace:Paint"
     Title="MainWindow"
     Width="800"
     Height="450"
@@ -86,13 +86,24 @@
             Grid.Row="1"
             Style="{StaticResource ActionGroup}">
             <StackPanel Style="{StaticResource ButtonGroup}">
-                <ToggleButton
-                    Margin="8"
-                    HorizontalAlignment="Center"
-                    x:Name="CopyToClipboard"
-                    Click="CopyToClipboard_Click"
-                    FontSize="24"
-                    Content="{ui:SymbolIcon SelectObject24}" />
+                <StackPanel Orientation="Horizontal">                              
+                    <ToggleButton
+                        Margin="8"
+                        HorizontalAlignment="Center"
+                        ToolTip="Copy to clipboard"
+                        x:Name="CopyToClipboard"
+                        Click="CopyToClipboard_Click"
+                        FontSize="24"
+                        Content="{ui:SymbolIcon Crop48}" />
+                    <ToggleButton
+                        Margin="8"
+                        HorizontalAlignment="Center"
+                        x:Name="SingleShapeSelector"
+                        ToolTip="Select a shape"
+                        Click="SingleShapeSelector_Click"
+                        FontSize="24"
+                        Content="{ui:SymbolIcon RectanglePortraitLocationTarget20}" />
+                </StackPanel>
                 <ui:TextBlock Text="Selection" TextAlignment="Center" />
             </StackPanel>
 
@@ -246,6 +257,8 @@
                     Margin="8"
                     Background="White"
                     MouseDown="DrawSpace_MouseDown"
+                    MouseEnter="DrawSpace_MouseEnter"
+                    MouseLeave="DrawSpace_MouseLeave"
                     MouseMove="DrawSpace_MouseMove"
                     MouseUp="DrawSpace_MouseUp"/>
             </ScrollViewer>

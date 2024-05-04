@@ -11,9 +11,9 @@ namespace Paint
         public List<BaseShape> DrawnShapes { get { return drawnShapes; } }
         public Canvas Content { get { return _content; } }
 
-        public Paper()
+        public Paper(Canvas mainPage)
         {
-            _content = new Canvas();
+            _content = mainPage;
         }
 
         public void AddShape(BaseShape shape)
@@ -69,6 +69,14 @@ namespace Paint
                 _content.Children.Add(content);
                 Canvas.SetTop(content, shape.Start.Y);
                 Canvas.SetLeft(content, shape.Start.X);
+            }
+        }
+
+        public void ChangeToSelect(bool isSelect)
+        {
+            foreach (var shape in drawnShapes)
+            {
+                shape.CanSelect = isSelect;
             }
         }
     }

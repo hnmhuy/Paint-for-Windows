@@ -2,6 +2,7 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace BaseShapes
@@ -18,7 +19,13 @@ namespace BaseShapes
         protected double strokeThickness;
         protected DoubleCollection dashArray;
         protected bool isDashStroke = true;
-
+        protected bool canSelect = false;
+        protected ShapeSelector selector;
+        public static double padding = 2;
+        protected Cursor previousCursor;
+       
+        public ShapeSelector Selector { get { return selector; } set { selector = value; } }
+        public bool CanSelect { get { return canSelect; } set { canSelect = value; } }
         public BaseShape()
         {
             _start = new Point(0, 0);
@@ -88,12 +95,12 @@ namespace BaseShapes
         }
 
         public abstract object Clone();
-        public abstract Canvas Render();
         public abstract void Resize();
         public abstract void SetStrokeColor(SolidColorBrush color);
         public abstract void SetStrokeFill(SolidColorBrush fill);
         public abstract void SetStrokeThickness(double thickness);
         public abstract void SetDashStroke(DoubleCollection dash);
+        public abstract Canvas Render();
 
         // Save the shape to a file
         public virtual void Save(BinaryWriter writer)
@@ -137,16 +144,28 @@ namespace BaseShapes
             }
         }
 
-
-
-        public void AttachClickEventToObject()
-        {
-            Border border = new Border()
-            { 
-                BorderBrush = Brushes.Red,
-                BorderThickness = new Thickness(15),
+        public void AttachEventHandler(UIElement element)
+        {           
+            element.MouseEnter += (sender, e) =>
+            {
+                if (previousCursor == null || previousCursor != Mouse.OverrideCursor)
+                {
+                    previousCursor = Mouse.OverrideCursor;
+                }
+                if (canSelect)
+                {
+                    Mouse.OverrideCursor = Cursors.Hand;
+                } 
             };
-            _canvas.Children.Add(border);
+            element.MouseLeave += (sender, e) =>
+            {
+                Mouse.OverrideCursor = previousCursor;
+            };
+
+            element.MouseDown += (sender, e) =>
+            {
+                selector.SelectShape(this);
+            };
         }
     }
 }
