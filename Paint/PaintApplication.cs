@@ -7,10 +7,14 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Reflection.Metadata;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
@@ -46,9 +50,12 @@ namespace Paint
         public List<Type> loadedType = new List<Type>();
         public Paper CurrentPage { get { return currPage; } }
         private Canvas mainPage = new Canvas();
-        public Canvas MainPage { get { return mainPage; } } 
+        public Canvas MainPage { get { return mainPage; } }
+        private bool haveText = false;
 
         // ==== UI Elements ====
+        private RichTextBox richTextBox;
+        private RichTextBox newRichTextBox;
         private StackPanel shapeStack;
         private BaseShape currPrototype;
         private Canvas drawingShape;
@@ -69,6 +76,35 @@ namespace Paint
                 layerReview = value;
                 UpdateLayerReview();
             } 
+        }
+
+        private SolidColorBrush textColor = Brushes.Black;
+        private SolidColorBrush textBackgroundColor = Brushes.Transparent;
+        public SolidColorBrush TextColor
+        {
+            get { return textColor; }
+            set
+            {
+                textColor = value;
+                OnPropertyChanged(nameof(TextColor));
+                if (richTextBox != null)
+                {
+                    UpdateRichTextBoxTextColor(richTextBox, TextColor);
+                }
+            }
+        }
+        public SolidColorBrush TextBackgroundColor
+        {
+            get { return textBackgroundColor; }
+            set
+            {
+                textBackgroundColor = value;
+                OnPropertyChanged(nameof(TextBackgroundColor));
+                if (richTextBox != null)
+                {
+                    richTextBox.Background = value;
+                }
+            }
         }
 
         // ==== Drawing attributes ====
@@ -365,6 +401,7 @@ namespace Paint
         }
 
         //= Moving shape
+        private DateTime lastClickTime = DateTime.MinValue;
         public void SelectorMouseHandler()
         {
             Canvas bounder = ShapeSelector.Border;
@@ -373,8 +410,10 @@ namespace Paint
 
             if (rect != null)
             {
+                
                 rect.MouseEnter += (sender, e) =>
                 {
+                   
                     if (currentTool != ToolType.AddText)
                     {
                         if (currCursor != Mouse.OverrideCursor)
@@ -396,17 +435,41 @@ namespace Paint
 
                 rect.MouseDown += (sender, e) =>
                 {
+                    TimeSpan timeSinceLastClick = DateTime.Now - lastClickTime;
+
+                    if (e.ClickCount == 2)
+                    {
+                        if (timeSinceLastClick.TotalMilliseconds < 500)
+                        {
+                            if (haveText)
+                            {
+                                Debug.WriteLine("have text");
+                                foreach (UIElement child in selector.SelectedShape.content.Children)
+                                {
+                                    if (child is RichTextBox richTextBox)
+                                    {
+                                        Debug.WriteLine("have text3");
+                                        ((RichTextBox)child).IsEnabled = true;
+                                        ((RichTextBox)child).Focus(); // Click Right Mouse to edit
+                                        ((RichTextBox)child).PreviewKeyDown += RichTextBox_PreviewKeyDown;
+                                        ((RichTextBox)child).BorderBrush = Brushes.LightGray;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                onAddingText();
+                            }
+                            currentTool = ToolType.AddText;
+                        }
+                    }
                     if (currentTool != ToolType.AddText)
                     {
                         selector.SelectedShape.content.Opacity = 0.8;
                         initalPoint = e.GetPosition(mainPage);
                         currentTool = ToolType.MovingShape;
                     }
-                    else
-                    {
-                        currentTool = ToolType.AddText;
-                        onAddingText();
-                    }
+                    lastClickTime = DateTime.Now;
                 };
                 rect.MouseMove += (sender, e) =>
                 {
@@ -418,6 +481,9 @@ namespace Paint
                 };
             }
         }
+
+        
+
         public void OnMovingShape(Point end)
         {
             double deltaX = end.X - initalPoint.X;
@@ -440,9 +506,109 @@ namespace Paint
         //= Add text
         public void onAddingText()
         {
-            TextBlock textBlock = new TextBlock();
-            textBlock.Text = "hahah";
-            selector.SelectedShape.content.Children.Add(textBlock);
+            double boxWidth = selector.SelectedShape.End.X - selector.SelectedShape.Start.X;
+            double boxHeight = selector.SelectedShape.End.Y - selector.SelectedShape.Start.Y;
+            richTextBox = new RichTextBox()
+            {
+                MinHeight = 30,
+                Width = boxWidth - 10,
+                Background = textBackgroundColor,
+                BorderThickness = new Thickness(2),
+                Foreground = textColor
+            };
+            selector.SelectedShape.content.Children.Add(richTextBox);
+
+            Canvas.SetLeft(richTextBox, 5);
+            Canvas.SetTop(richTextBox, 5);
+
+            richTextBox.PreviewKeyDown += RichTextBox_PreviewKeyDown;
+        }
+
+        private void RichTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter && Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                onAddingTextComplete((RichTextBox)sender);
+            }
+        }
+
+        public void onAddingTextComplete(RichTextBox richTextBox)
+        {
+            if (richTextBox.Document != null && richTextBox.Document.Blocks.Count > 0)
+            {
+                bool hasContent = false;
+
+                // Iterate over the paragraphs in the RichTextBox
+                foreach (Block block in richTextBox.Document.Blocks)
+                {
+                    if (block is Paragraph paragraph)
+                    {
+                        // Check if the paragraph contains any non-empty text
+                        foreach (Inline inline in paragraph.Inlines)
+                        {
+                            if (inline is Run run && !string.IsNullOrWhiteSpace(run.Text))
+                            {
+                                hasContent = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (hasContent)
+                    {
+                        break;
+                    }
+                }
+
+                // Disable the RichTextBox if it has content
+                if (hasContent)
+                {
+                    haveText = true;
+                    richTextBox.IsReadOnly = true;
+                    richTextBox.BorderBrush = Brushes.Transparent;
+                    string xmlString = XamlWriter.Save(richTextBox.Document);
+                    selector.SelectedShape.content.Children.Remove(richTextBox);
+                    AddTextCommand command = new AddTextCommand(selector, currPage, xmlString, textColor, textBackgroundColor);
+                    ExecuteCommand(command);
+                }
+                else
+                {
+                    haveText = false;
+
+                    // Remove the RichTextBox if it doesn't have content
+                    selector.SelectedShape.content.Children.Remove(richTextBox);
+                }
+            }
+            else
+            {
+                haveText = false;
+
+                // Remove the RichTextBox if it doesn't have content
+                selector.SelectedShape.content.Children.Remove(richTextBox);
+            }
+        }
+
+        public void UpdateRichTextBoxTextColor(RichTextBox richTextBox, SolidColorBrush newTextColor)
+        {
+            if (richTextBox.Document != null)
+            {
+                // Iterate over the paragraphs in the RichTextBox
+                foreach (Block block in richTextBox.Document.Blocks)
+                {
+                    if (block is Paragraph paragraph)
+                    {
+                        // Iterate over the inlines (runs) in the paragraph
+                        foreach (Inline inline in paragraph.Inlines)
+                        {
+                            // Check if the inline is a Run
+                            if (inline is Run run)
+                            {
+                                // Update the Foreground property of the Run to the new text color
+                                run.Foreground = newTextColor;
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         // Helper method to change prototyes' properties

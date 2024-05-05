@@ -316,5 +316,9 @@ namespace Paint
             
         }
 
+        private void AddLayer_Click(object sender, RoutedEventArgs e)
+        {
+            application.AddLayer();
+        }
     }
 }
