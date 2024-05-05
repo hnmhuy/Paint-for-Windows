@@ -81,7 +81,7 @@ namespace Paint.Models
         {
             drawnShapes.Remove(shape);
             _content.Children.Remove(shape.content);
-            int index = previewShapes.IndexOf(shape);
+            int index = previewShapes.FindIndex(baseShape => baseShape.Id == shape.Id);
             _preivewLayer.Children.Remove(previewShapes[index].content);
             previewShapes.RemoveAt(index);
             OnPropertyChanged(nameof(DrawnShapes));

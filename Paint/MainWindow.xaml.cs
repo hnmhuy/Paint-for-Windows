@@ -320,5 +320,20 @@ namespace Paint
         {
             application.AddLayer();
         }
+
+        private void CopyButton_Click(object sender, RoutedEventArgs e)
+        {
+           application.Copy();
+        }
+
+        private void PasteButton_Click(object sender, RoutedEventArgs e)
+        {
+            application.PasteCommand();
+        }
+
+        private void CutButton_Click(object sender, RoutedEventArgs e)
+        {
+            application.Cut();
+        }
     }
 }
