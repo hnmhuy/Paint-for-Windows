@@ -404,6 +404,7 @@ namespace Paint
         private DateTime lastClickTime = DateTime.MinValue;
         public void SelectorMouseHandler()
         {
+            //Right Version
             Canvas bounder = ShapeSelector.Border;
             Rectangle? rect = bounder.Children[0] as Rectangle;
             Cursor currCursor = Mouse.OverrideCursor;
