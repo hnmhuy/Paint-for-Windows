@@ -34,6 +34,9 @@ namespace ShapeEllipse
                 StrokeDashArray = this.dashArray,
             };
             _canvas.Children.Add(ellipse);
+
+            base.AttachEventHandler(ellipse);
+            base.generateShapeContent();
             return _canvas;
         }
 

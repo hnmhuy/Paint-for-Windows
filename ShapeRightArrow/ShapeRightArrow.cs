@@ -35,6 +35,9 @@ namespace ShapeRightArrow
             rightArrow.StrokeDashArray = this.dashArray;
             rightArrow.Points = CalculateRightArrowPoints(width, height);
 
+            base.AttachEventHandler(rightArrow);
+            base.generateShapeContent();
+
             _canvas.Children.Add(rightArrow);
 
             return _canvas;

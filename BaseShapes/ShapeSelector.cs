@@ -96,6 +96,8 @@ namespace BaseShapes
             if (instance.selectedShape != null)
             {
                 instance.selectedShape.content.Children.Remove(border);
+
+                
             }
             instance.selectedShape = null;
         }

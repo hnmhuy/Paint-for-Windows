@@ -53,9 +53,14 @@ namespace Paint
         private Canvas mainPage = new Canvas();
         public Canvas MainPage { get { return mainPage; } }
         private bool haveText = false;
-
+        private bool isAddingText = false;
+        
         // ==== UI Elements ====
-        private RichTextBox richTextBox;
+        private RichTextBox richTextBox = new RichTextBox()
+        {
+            MinHeight = 30,
+            BorderThickness = new Thickness(2)
+        };
         private RichTextBox newRichTextBox;
         private StackPanel shapeStack;
         private BaseShape currPrototype;
@@ -457,7 +462,7 @@ namespace Paint
                         currentTool = ToolType.MovingShape;
                     }
                     // Mouse right for adding text  
-                    if (e.ChangedButton == MouseButton.Right && currentTool != ToolType.MovingShape)
+                    if (e.ChangedButton == MouseButton.Right && !isAddingText)
                     {
                         if (haveText)
                         {
@@ -579,17 +584,31 @@ namespace Paint
         //= Add text
         public void onAddingText()
         {
+            isAddingText = true;
+            // Disconnect the rich text box from the shape
+            if (richTextBox.Parent!= null)
+            {
+                ((Canvas)richTextBox.Parent).Children.Remove(richTextBox);
+            }
+
             Debug.WriteLine("Adding text");
             double boxWidth = selector.SelectedShape.End.X - selector.SelectedShape.Start.X;
             double boxHeight = selector.SelectedShape.End.Y - selector.SelectedShape.Start.Y;
-            richTextBox = new RichTextBox()
-            {
-                MinHeight = 30,
-                Width = boxWidth - 10,
-                Background = textBackgroundColor,
-                BorderThickness = new Thickness(2),
-                Foreground = textColor
-            };
+            //richTextBox = new RichTextBox()
+            //{
+            //    MinHeight = 30,
+            //    Width = boxWidth - 10,
+            //    Background = textBackgroundColor,
+            //    BorderThickness = new Thickness(2),
+            //    Foreground = textColor
+            //};
+
+            richTextBox.Width = boxWidth - 10;
+            richTextBox.Background = textBackgroundColor;
+            richTextBox.Foreground = textColor;
+
+            // Clear all content
+            richTextBox.Document.Blocks.Clear();
             selector.SelectedShape.content.Children.Add(richTextBox);
 
             Canvas.SetLeft(richTextBox, 5);
@@ -603,6 +622,7 @@ namespace Paint
             if (e.Key == Key.Enter && Keyboard.Modifiers == ModifierKeys.Control)
             {
                 onAddingTextComplete((RichTextBox)sender);
+                isAddingText = false; 
             }
         }
 

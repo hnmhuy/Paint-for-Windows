@@ -1,6 +1,7 @@
 ﻿using BaseShapes;
 using Paint.Controller;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -168,6 +169,9 @@ namespace Paint.Models
                 _preivewLayer.Children.Remove(previewShapes[index].content);
                 AddShapeReview(newShape, index);
 
+            } else
+            {
+                Debug.WriteLine("Cannot find the shape to replace");    
             }
         }
 
