@@ -276,6 +276,16 @@
                     MouseUp="DrawSpace_MouseUp"/>
             </ScrollViewer>
         </Border>
+
+        <Border Grid.Row="2" HorizontalAlignment="Right" Width="120" Margin="12" ClipToBounds="True" CornerRadius="8" Background="{ui:ThemeResource TextFillColorSecondaryBrush}">
+            <StackPanel Orientation="Vertical">
+                <Button Content="{ui:SymbolIcon AddCircle24}" Background="Transparent" BorderBrush="Transparent" HorizontalAlignment="Center"/>
+                <Separator/>
+                
+                
+            </StackPanel>
+        </Border>
+        
         <Border
             Grid.Row="0"
             BorderBrush="LightGray"

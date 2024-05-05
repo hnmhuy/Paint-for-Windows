@@ -1,8 +1,9 @@
 ﻿using BaseShapes;
+using Paint.Controller;
 using System.IO;
 using System.Windows.Controls;
 
-namespace Paint
+namespace Paint.Models
 {
     public class Paper
     {
@@ -45,9 +46,9 @@ namespace Paint
             int count = binaryReader.ReadInt32();
             for (int i = 0; i < count; i++)
             {
-                String name = binaryReader.ReadString();
+                string name = binaryReader.ReadString();
                 BaseShape shape = ShapeFactory.CreateShape(types, name, binaryReader);
-                if (shape!= null)
+                if (shape != null)
                 {
                     shape.Render();
                     AddShape(shape);

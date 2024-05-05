@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Paint
+namespace Paint.Controller
 {
     public class ShapeFactory
     {

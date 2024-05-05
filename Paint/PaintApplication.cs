@@ -1,6 +1,7 @@
 ﻿using BaseShapes;
 using Microsoft.Win32;
 using Paint.Commands;
+using Paint.Models;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -27,50 +28,8 @@ namespace Paint
     }
     public class PaintApplication : INotifyPropertyChanged
     {
-        // Attributes
-        private Grid drawSpace;
+        // ==== Attributes ====
         private ToolType currentTool = ToolType.None;
-        public event PropertyChangedEventHandler? PropertyChanged;
-        private List<BaseShape> prototypes = new List<BaseShape>();
-        private List<Paper> papers = new List<Paper>();
-        private Paper currPage;
-        public List<Type> loadedType = new List<Type>();
-        public Paper CurrentPage { get { return currPage; } }
-        private Canvas mainPage = new Canvas();
-        public Canvas MainPage { get { return mainPage; } } 
-
-        // UI refs
-        private StackPanel shapeStack;
-        private BaseShape currPrototype;
-        private Canvas drawingShape;
-       
-        // Prototype attributes
-        private double thickness = 1;
-        private DoubleCollection strokeType = new DoubleCollection();
-        private SolidColorBrush strokeColor = Brushes.Black;
-        private SolidColorBrush fillColor = Brushes.Transparent;
-
-        // Controlling attributes
-        private MouseEditor editor = new MouseEditor();
-        public CopyToClipboardHandler copyToClipboardHandler = CopyToClipboardHandler.Instance;
-        private CommandHistory commandHistory = new CommandHistory();
-        public ShapeSelector selector = ShapeSelector.Instance;
-        private UndoCommand undoCommand;
-        private bool isDrawing = false;
-        private bool canUndo = false;
-        private bool canRedo = false;
-        private Point initalPoint;
-
-
-        public Grid DrawSpace
-        {
-            get { return drawSpace; }
-            set
-            {
-                drawSpace = value;
-                OnPropertyChanged(nameof(DrawSpace));
-            }
-        }
         public ToolType CurrentTool
         {
             get { return currentTool; }
@@ -80,11 +39,35 @@ namespace Paint
                 OnPropertyChanged(nameof(CurrentTool));
             }
         }
-        // Implement INotifyPropertyChanged interface
-        private void OnPropertyChanged(string propertyName)
+        public event PropertyChangedEventHandler? PropertyChanged;
+        private List<BaseShape> prototypes = new List<BaseShape>();
+        private List<Paper> papers = new List<Paper>();
+        private Paper currPage;
+        public List<Type> loadedType = new List<Type>();
+        public Paper CurrentPage { get { return currPage; } }
+        private Canvas mainPage = new Canvas();
+        public Canvas MainPage { get { return mainPage; } } 
+
+        // ==== UI Elements ====
+        private StackPanel shapeStack;
+        private BaseShape currPrototype;
+        private Canvas drawingShape;
+        private Grid drawSpace;
+        public Grid DrawSpace
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }        
+            get { return drawSpace; }
+            set
+            {
+                drawSpace = value;
+                OnPropertyChanged(nameof(DrawSpace));
+            }
+        }
+
+        // ==== Drawing attributes ====
+        private double thickness = 1;
+        private DoubleCollection strokeType = new DoubleCollection();
+        private SolidColorBrush strokeColor = Brushes.Black;
+        private SolidColorBrush fillColor = Brushes.Transparent;
         public double Thickness
         {
             get { return thickness; }
@@ -97,8 +80,8 @@ namespace Paint
         }
         public DoubleCollection StrokeType
         {
-            get { return  strokeType; } 
-            set 
+            get { return strokeType; }
+            set
             {
                 strokeType = value;
                 OnPropertyChanged(nameof(StrokeType));
@@ -126,6 +109,16 @@ namespace Paint
                 ColorFillChanged();
             }
         }
+        // ==== Interactive attributes ====
+        private MouseEditor editor = new MouseEditor();
+        public CopyToClipboardHandler copyToClipboardHandler = CopyToClipboardHandler.Instance;
+        private CommandHistory commandHistory = new CommandHistory();
+        public ShapeSelector selector = ShapeSelector.Instance;
+        private UndoCommand undoCommand;
+        private bool isDrawing = false;
+        private bool canUndo = false;
+        private bool canRedo = false;
+        private Point initalPoint;
         public bool CanUndo
         {
             get { return canUndo; }
@@ -145,6 +138,12 @@ namespace Paint
             }
         }
 
+        // Implement INotifyPropertyChanged interface
+        private void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }        
+
         // Constructor
         public PaintApplication()
         {
@@ -154,7 +153,7 @@ namespace Paint
             SelectorMouseHandler();
         }
 
-        // Set up methods
+        // === Set up methods ===
         private void LoadPrototypes()
         {
             String folder = AppDomain.CurrentDomain.BaseDirectory;
@@ -227,8 +226,19 @@ namespace Paint
                 page.ChangeToSelect(isSelecting);
             }
         }
+        public void ChangeToAddTextMode(bool isAddingText)
+        {
+            CurrentTool = isAddingText ? ToolType.AddText : ToolType.None;
+            foreach (var page in papers)
+            {
+                page.ChangeToAddText(isAddingText);
+            }
 
-        // Mouse event handlers
+        }
+
+        // ==== Mouse events ====
+
+        //= Drawing
         private void Canvas_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             // Identify the clicked canvas
@@ -278,6 +288,7 @@ namespace Paint
             this.ExecuteCommand(command);
         }
 
+        //= Moving shape
         public void SelectorMouseHandler()
         {
             Canvas bounder = ShapeSelector.Border;
@@ -288,13 +299,20 @@ namespace Paint
             {
                 rect.MouseEnter += (sender, e) =>
                 {
-                    if (currCursor != Mouse.OverrideCursor)
+                    if (currentTool != ToolType.AddText)
                     {
-                        currCursor = Mouse.OverrideCursor;
+                        if (currCursor != Mouse.OverrideCursor)
+                        {
+                            currCursor = Mouse.OverrideCursor;
+                        }
+                        Mouse.OverrideCursor = Cursors.SizeAll;
                     }
-                    Mouse.OverrideCursor = Cursors.SizeAll;
-                };
+                    else
+                    {
+                        Mouse.OverrideCursor = Cursors.IBeam;
+                    }
 
+                };
                 rect.MouseLeave += (sender, e) =>
                 {
                     Mouse.OverrideCursor = currCursor;
@@ -302,9 +320,25 @@ namespace Paint
 
                 rect.MouseDown += (sender, e) =>
                 {
-                    selector.SelectedShape.content.Opacity = 0.8;
-                    initalPoint = e.GetPosition(mainPage);
-                    currentTool = ToolType.MovingShape;
+                    if (currentTool != ToolType.AddText)
+                    {
+                        selector.SelectedShape.content.Opacity = 0.8;
+                        initalPoint = e.GetPosition(mainPage);
+                        currentTool = ToolType.MovingShape;
+                    }
+                    else
+                    {
+                        currentTool = ToolType.AddText;
+                        onAddingText();
+                    }
+                };
+                rect.MouseMove += (sender, e) =>
+                {
+                    if (currentTool == ToolType.AddText)
+                    {
+                        Mouse.OverrideCursor = Cursors.IBeam;
+                    }
+
                 };
             }
         }
@@ -323,6 +357,14 @@ namespace Paint
             double deltaY = newPoint.Y - initalPoint.Y;
             ShapeMoveCommand command = new ShapeMoveCommand(selector, new Point(deltaX, deltaY), currPage);
             ExecuteCommand(command);
+        }
+
+        //= Add text
+        public void onAddingText()
+        {
+            TextBlock textBlock = new TextBlock();
+            textBlock.Text = "hahah";
+            selector.SelectedShape.content.Children.Add(textBlock);
         }
 
         // Helper method to change prototyes' properties
@@ -369,9 +411,7 @@ namespace Paint
                 item.SetStrokeFill(fillColor);
             }
         }
-        
 
-        
         //==== Commands ====
         private void ExecuteCommand(Command command)
         {
@@ -396,7 +436,7 @@ namespace Paint
             UpdateHistoryState();
         }
 
-        // Files commands
+        //= Files commands
         public void SaveFile()
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();   
@@ -461,104 +501,6 @@ namespace Paint
                 }
             }
             return isEmpty;
-        }
-
-        public void ChangeToSelectingMode(bool isSelecting)
-        {
-            CurrentTool = isSelecting ? ToolType.Select : ToolType.None;
-            foreach(var page in papers)
-            {
-                page.ChangeToSelect(isSelecting);
-            }
-        }
-
-        public void ChangeToAddTextMode(bool isAddingText)
-        {
-            CurrentTool = isAddingText ? ToolType.AddText : ToolType.None;
-            foreach (var page in papers)
-            {
-                page.ChangeToAddText(isAddingText);
-            }
-
-        }
-
-        public void SelectorMouseHandler()
-        {
-            Canvas bounder = ShapeSelector.Border;
-            Rectangle? rect = bounder.Children[0] as Rectangle;
-            Cursor currCursor = Mouse.OverrideCursor;
-            
-            if (rect!=null)
-            {
-                rect.MouseEnter += (sender, e) =>
-                {
-                    if(currentTool != ToolType.AddText)
-                    {
-                        if (currCursor != Mouse.OverrideCursor)
-                        {
-                            currCursor = Mouse.OverrideCursor;
-                        }
-                        Mouse.OverrideCursor = Cursors.SizeAll;
-                    }
-                    else
-                    {
-                        Mouse.OverrideCursor = Cursors.IBeam;
-                    }    
-                  
-                };
-                rect.MouseLeave += (sender, e) =>
-                {
-                    Mouse.OverrideCursor = currCursor;
-                };
-
-                rect.MouseDown += (sender, e) =>
-                {
-                    if(currentTool != ToolType.AddText)
-                    {
-                        selector.SelectedShape.content.Opacity = 0.8;
-                        initalPoint = e.GetPosition(mainPage);
-                        currentTool = ToolType.MovingShape;
-                    }
-                    else
-                    {
-                        currentTool = ToolType.AddText;
-                        onAddingText();
-                    }    
-                };
-                rect.MouseMove += (sender, e) =>
-                {
-                    if (currentTool == ToolType.AddText)
-                    {
-                        Mouse.OverrideCursor = Cursors.IBeam;
-                    }
-
-                };
-            }
-        }
-
-        public void onAddingText()
-        {
-            TextBlock textBlock = new TextBlock();
-            textBlock.Text = "hahah";
-            selector.SelectedShape.content.Children.Add(textBlock);
-        }
-
-        public void OnMovingShape(Point end)
-        {
-            double deltaX = end.X - initalPoint.X;
-            double deltaY = end.Y - initalPoint.Y;           
-            selector.SelectedShape.content.SetValue(Canvas.LeftProperty, selector.SelectedShape.Start.X + deltaX);
-            selector.SelectedShape.content.SetValue(Canvas.TopProperty, selector.SelectedShape.Start.Y + deltaY);
-        }
-
-        public void OnMovingShapeComplete(Point newPoint)
-        {
-            selector.SelectedShape.content.Opacity = 1;            
-            currentTool = ToolType.Select;
-            double deltaX = newPoint.X - initalPoint.X;
-            double deltaY = newPoint.Y - initalPoint.Y;
-            ShapeMoveCommand command = new ShapeMoveCommand(selector, new Point(deltaX, deltaY), currPage);
-            ExecuteCommand(command);
-        }
+        }  
     }
 }

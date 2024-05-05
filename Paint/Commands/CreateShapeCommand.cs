@@ -1,4 +1,5 @@
 ﻿using BaseShapes;
+using Paint.Models;
 
 namespace Paint.Commands
 {
