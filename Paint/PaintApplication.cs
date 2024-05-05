@@ -407,7 +407,7 @@ namespace Paint
             //Right Version
             Canvas bounder = ShapeSelector.Border;
             Rectangle? rect = bounder.Children[0] as Rectangle;
-            Cursor currCursor = Mouse.OverrideCursor;
+            Cursor currCursor = Cursors.Arrow;
 
             if (rect != null)
             {
@@ -415,18 +415,29 @@ namespace Paint
                 rect.MouseEnter += (sender, e) =>
                 {
                    
-                    if (currentTool != ToolType.AddText)
+                    if (currentTool == ToolType.Select)
                     {
-                        if (currCursor != Mouse.OverrideCursor)
-                        {
-                            currCursor = Mouse.OverrideCursor;
-                        }
-                        Mouse.OverrideCursor = Cursors.SizeAll;
-                    }
-                    else
+                        Mouse.OverrideCursor = Cursors.Hand;
+                    } else if (currentTool == ToolType.AddText)
                     {
                         Mouse.OverrideCursor = Cursors.IBeam;
+                    } else if (currentTool == ToolType.MovingShape)
+                    {
+                        Mouse.OverrideCursor = Cursors.SizeAll;
                     }
+
+                    //if (currentTool != ToolType.AddText)
+                    //{
+                    //    if (currCursor != Mouse.OverrideCursor)
+                    //    {
+                    //        currCursor = Mouse.OverrideCursor;
+                    //    }
+                    //    Mouse.OverrideCursor = Cursors.SizeAll;
+                    //}
+                    //else
+                    //{
+                    //    Mouse.OverrideCursor = Cursors.IBeam;
+                    //}
 
                 };
                 rect.MouseLeave += (sender, e) =>
@@ -436,40 +447,71 @@ namespace Paint
 
                 rect.MouseDown += (sender, e) =>
                 {
-                    TimeSpan timeSinceLastClick = DateTime.Now - lastClickTime;
 
-                    if (e.ClickCount == 2)
-                    {
-                        if (timeSinceLastClick.TotalMilliseconds < 500)
-                        {
-                            if (haveText)
-                            {
-                                Debug.WriteLine("have text");
-                                foreach (UIElement child in selector.SelectedShape.content.Children)
-                                {
-                                    if (child is RichTextBox richTextBox)
-                                    {
-                                        Debug.WriteLine("have text3");
-                                        ((RichTextBox)child).IsEnabled = true;
-                                        ((RichTextBox)child).Focus(); // Click Right Mouse to edit
-                                        ((RichTextBox)child).PreviewKeyDown += RichTextBox_PreviewKeyDown;
-                                        ((RichTextBox)child).BorderBrush = Brushes.LightGray;
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                onAddingText();
-                            }
-                            currentTool = ToolType.AddText;
-                        }
-                    }
-                    if (currentTool != ToolType.AddText)
+                    // Mouse left for moving shape
+                    if (e.ChangedButton == MouseButton.Left && currentTool != ToolType.AddText)
                     {
                         selector.SelectedShape.content.Opacity = 0.8;
                         initalPoint = e.GetPosition(mainPage);
                         currentTool = ToolType.MovingShape;
                     }
+                    // Mouse right for adding text  
+                    if (e.ChangedButton == MouseButton.Right && currentTool != ToolType.MovingShape)
+                    {
+                        if (haveText)
+                        {
+                            foreach (UIElement child in selector.SelectedShape.content.Children)
+                            {
+                                if (child is RichTextBox richTextBox)
+                                {
+                                    ((RichTextBox)child).IsEnabled = true;
+                                    ((RichTextBox)child).Focus(); // Click Right Mouse to edit
+                                    ((RichTextBox)child).PreviewKeyDown += RichTextBox_PreviewKeyDown;
+                                    ((RichTextBox)child).BorderBrush = Brushes.LightGray;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            onAddingText();
+                        }
+                        currentTool = ToolType.AddText;
+                    }
+
+                    //TimeSpan timeSinceLastClick = DateTime.Now - lastClickTime;
+
+                    //if (e.ClickCount == 2 && timeSinceLastClick.TotalMilliseconds < 500)
+                    //{
+                    //    if (haveText)
+                    //    {                           
+                    //        foreach (UIElement child in selector.SelectedShape.content.Children)
+                    //        {
+                    //            if (child is RichTextBox richTextBox)
+                    //            {
+                    //                ((RichTextBox)child).IsEnabled = true;
+                    //                ((RichTextBox)child).Focus(); // Click Right Mouse to edit
+                    //                ((RichTextBox)child).PreviewKeyDown += RichTextBox_PreviewKeyDown;
+                    //                ((RichTextBox)child).BorderBrush = Brushes.LightGray;
+                    //            }
+                    //        }
+                    //    }
+                    //    else
+                    //    {
+                    //        onAddingText();
+                    //    }
+                    //    currentTool = ToolType.AddText;
+                    //} else if (currentTool == ToolType.Select)
+                    //{
+                    //    selector.SelectedShape.content.Opacity = 0.8;
+                    //    initalPoint = e.GetPosition(mainPage);
+                    //    currentTool = ToolType.MovingShape;
+                    //}
+                    //if (currentTool != ToolType.AddText)
+                    //{
+                    //    selector.SelectedShape.content.Opacity = 0.8;
+                    //    initalPoint = e.GetPosition(mainPage);
+                    //    currentTool = ToolType.MovingShape;
+                    //}
                     lastClickTime = DateTime.Now;
                 };
                 rect.MouseMove += (sender, e) =>
@@ -494,6 +536,7 @@ namespace Paint
         }
         public void OnMovingShapeComplete(Point newPoint)
         {
+            if (currentTool != ToolType.MovingShape) return;
             selector.SelectedShape.content.Opacity = 1;
             Mouse.OverrideCursor = Cursors.Arrow;
             currentTool = ToolType.Select;
@@ -507,6 +550,7 @@ namespace Paint
         //= Add text
         public void onAddingText()
         {
+            Debug.WriteLine("Adding text");
             double boxWidth = selector.SelectedShape.End.X - selector.SelectedShape.Start.X;
             double boxHeight = selector.SelectedShape.End.Y - selector.SelectedShape.Start.Y;
             richTextBox = new RichTextBox()
@@ -586,6 +630,7 @@ namespace Paint
                 // Remove the RichTextBox if it doesn't have content
                 selector.SelectedShape.content.Children.Remove(richTextBox);
             }
+            currentTool = ToolType.Select;
         }
 
         public void UpdateRichTextBoxTextColor(RichTextBox richTextBox, SolidColorBrush newTextColor)
