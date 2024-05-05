@@ -41,6 +41,9 @@ namespace Paint.Commands
             newShape.TextColor = textColor;
             newShape.TextBackgroundColor = textBackgroundColor;
             newShape.Render();
+
+            Canvas.SetTop(newShape.content, newShape.Start.Y);
+            Canvas.SetLeft(newShape.content, newShape.Start.X);
             receiver.Replace(this.backup, newShape);
             selector.SelectShape(newShape);
 

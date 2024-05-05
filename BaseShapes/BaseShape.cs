@@ -133,7 +133,8 @@ namespace BaseShapes
             richTextBox.Background = textBackgroundColor;
             _canvas.Children.Add(richTextBox);
             Canvas.SetLeft(richTextBox, 5);
-            Canvas.SetTop(richTextBox, 5);
+            double height = _end.Y - _start.Y;  
+            Canvas.SetTop(richTextBox, (height - richTextBox.ActualHeight)/2);
         }
 
         public abstract object Clone();

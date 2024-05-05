@@ -414,6 +414,8 @@ namespace Paint
             Rectangle? rect = bounder.Children[0] as Rectangle;
             Cursor currCursor = Cursors.Arrow;
 
+            ShapeSelector.TextBox.PreviewKeyDown += RichTextBox_PreviewKeyDown;
+
             if (rect != null)
             {
                 
@@ -530,8 +532,6 @@ namespace Paint
             }
         }
 
-        
-
         public void OnMovingShape(Point end)
         {
             double deltaX = end.X - initalPoint.X;
@@ -556,36 +556,39 @@ namespace Paint
         public void onAddingText()
         {
             isAddingText = true;
-            // Disconnect the rich text box from the shape
-            if (richTextBox.Parent!= null)
-            {
-                ((Canvas)richTextBox.Parent).Children.Remove(richTextBox);
-            }
+            selector.IsTextEditing = true;
 
-            Debug.WriteLine("Adding text");
-            double boxWidth = selector.SelectedShape.End.X - selector.SelectedShape.Start.X;
-            double boxHeight = selector.SelectedShape.End.Y - selector.SelectedShape.Start.Y;
-            //richTextBox = new RichTextBox()
+            //isAddingText = true;
+            //// Disconnect the rich text box from the shape
+            //if (richTextBox.Parent!= null)
             //{
-            //    MinHeight = 30,
-            //    Width = boxWidth - 10,
-            //    Background = textBackgroundColor,
-            //    BorderThickness = new Thickness(2),
-            //    Foreground = textColor
-            //};
+            //    ((Canvas)richTextBox.Parent).Children.Remove(richTextBox);
+            //}
 
-            richTextBox.Width = boxWidth - 10;
-            richTextBox.Background = textBackgroundColor;
-            richTextBox.Foreground = textColor;
+            //Debug.WriteLine("Adding text");
+            //double boxWidth = selector.SelectedShape.End.X - selector.SelectedShape.Start.X;
+            //double boxHeight = selector.SelectedShape.End.Y - selector.SelectedShape.Start.Y;
+            ////richTextBox = new RichTextBox()
+            ////{
+            ////    MinHeight = 30,
+            ////    Width = boxWidth - 10,
+            ////    Background = textBackgroundColor,
+            ////    BorderThickness = new Thickness(2),
+            ////    Foreground = textColor
+            ////};
 
-            // Clear all content
-            richTextBox.Document.Blocks.Clear();
-            selector.SelectedShape.content.Children.Add(richTextBox);
+            //richTextBox.Width = boxWidth - 10;
+            //richTextBox.Background = textBackgroundColor;
+            //richTextBox.Foreground = textColor;
 
-            Canvas.SetLeft(richTextBox, 5);
-            Canvas.SetTop(richTextBox, 5);
+            //// Clear all content
+            //richTextBox.Document.Blocks.Clear();
+            //selector.SelectedShape.content.Children.Add(richTextBox);
 
-            richTextBox.PreviewKeyDown += RichTextBox_PreviewKeyDown;
+            //Canvas.SetLeft(richTextBox, 5);
+            //Canvas.SetTop(richTextBox, 5);
+
+            //richTextBox.PreviewKeyDown += RichTextBox_PreviewKeyDown;
         }
 
         private void RichTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -593,6 +596,7 @@ namespace Paint
             if (e.Key == Key.Enter && Keyboard.Modifiers == ModifierKeys.Control)
             {
                 onAddingTextComplete((RichTextBox)sender);
+                selector.IsTextEditing = false;
                 isAddingText = false; 
             }
         }
@@ -627,11 +631,11 @@ namespace Paint
                 // Disable the RichTextBox if it has content
                 if (hasContent)
                 {
-                    haveText = true;
-                    richTextBox.IsReadOnly = true;
-                    richTextBox.BorderBrush = Brushes.Transparent;
+                    //haveText = true;
+                    //richTextBox.IsReadOnly = true;
+                    //richTextBox.BorderBrush = Brushes.Transparent;
                     string xmlString = XamlWriter.Save(richTextBox.Document);
-                    selector.SelectedShape.content.Children.Remove(richTextBox);
+                    //selector.SelectedShape.content.Children.Remove(richTextBox);
                     AddTextCommand command = new AddTextCommand(selector, currPage, xmlString, textColor, textBackgroundColor);
                     ExecuteCommand(command);
                 }

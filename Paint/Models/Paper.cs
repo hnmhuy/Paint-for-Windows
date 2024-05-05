@@ -65,6 +65,20 @@ namespace Paint.Models
             }
             Canvas.SetTop(temp.content, temp.Start.Y);
             Canvas.SetLeft(temp.content, temp.Start.X);
+
+            if (shape.ContentOnShape!= null)
+            {
+                // Find and remove the RichTextBox from the content
+                foreach (UIElement element in temp.content.Children)
+                {
+                    if (element is RichTextBox)
+                    {
+                        temp.content.Children.Remove(element);
+                        break;
+                    }
+                }
+            }
+
             OnPropertyChanged(nameof(PreviewLayer));
         }
 

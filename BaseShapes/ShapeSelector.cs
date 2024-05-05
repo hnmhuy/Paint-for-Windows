@@ -1,4 +1,6 @@
 ﻿using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -12,6 +14,48 @@ namespace BaseShapes
         private static Ellipse[] points = new Ellipse[9];
         private static ShapeSelector instance = new ShapeSelector();
         public static ShapeSelector Instance { get { return instance; } }
+        private static RichTextBox textBox = new RichTextBox()
+        {
+            MinHeight = 30,
+            BorderBrush = Brushes.Red,
+            Background = Brushes.White,
+            BorderThickness = new System.Windows.Thickness(1)
+        };
+        public static RichTextBox TextBox { get { return textBox;  } }
+        private bool isTextEditing = false;
+        public bool IsTextEditing { get { return isTextEditing; } set {
+                isTextEditing = value; 
+                // add or remove the textbox from the border
+                if (textBox.Parent != null)
+                {
+                    // Remove the textbox from the border
+                    border.Children.Remove(textBox);
+                }
+
+                if (isTextEditing)
+                {
+                    textBox.Document.Blocks.Clear();
+                    if (selectedShape != null && selectedShape.ContentOnShape != null)
+                    {
+                        FlowDocument document = (FlowDocument)XamlReader.Parse(selectedShape.ContentOnShape);
+                        // Set the FlowDocument as the content of the RichTextBox
+                        textBox.Document = document;
+                    }
+                    
+                    textBox.Width = selectedShape.End.X - selectedShape.Start.X;
+                    Canvas.SetLeft(textBox, 5);
+                    double height = selectedShape.End.Y - selectedShape.Start.Y;
+                    Canvas.SetTop(textBox, height / 2 - textBox.ActualHeight / 2);
+                    border.Children.Add(textBox);
+                    textBox.Focus();
+                }
+                else
+                {
+                    border.Children.Remove(textBox);
+                }
+            } 
+        }
+
 
         private ShapeSelector() { 
             Rectangle rect = new Rectangle()
