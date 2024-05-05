@@ -173,6 +173,7 @@ namespace Paint.Models
                 drawnShapes.Remove(oldShape);
                 // Find the index of the old shape in the content
                 int contentIndex = _content.Children.IndexOf(oldShape.content);
+                if (contentIndex == -1) { contentIndex = 0; }
                 // Remove the old shape from the content
                 _content.Children.Remove(oldShape.content);
                 // Add the new shape to the content

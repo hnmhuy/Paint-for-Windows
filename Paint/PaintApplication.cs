@@ -126,6 +126,12 @@ namespace Paint
                 thickness = value;
                 OnPropertyChanged(nameof(Thickness));
                 StrokeThicknessChanged();
+
+                if (selector.SelectedShape != null)
+                {
+                    ChangeStrokeWeight command = new ChangeStrokeWeight(currPage, selector.SelectedShape, value);
+                    ExecuteCommand(command);
+                }
             }
         }
         public DoubleCollection StrokeType
@@ -136,7 +142,11 @@ namespace Paint
                 strokeType = value;
                 OnPropertyChanged(nameof(StrokeType));
                 DashStrokeChanged();
-
+                if (selector.SelectedShape != null && currentTool == ToolType.Select)
+                {
+                    ChangeStrokeType changeStrokeType = new ChangeStrokeType(currPage, selector.SelectedShape, value);
+                    ExecuteCommand(changeStrokeType);
+                }
             }
         }
         public SolidColorBrush StrokeColor
@@ -147,6 +157,12 @@ namespace Paint
                 strokeColor = value;
                 OnPropertyChanged(nameof(StrokeColor));
                 ColorStrokeChanged();
+
+                if (selector.SelectedShape != null)
+                {
+                    StrokeColorCommand command = new StrokeColorCommand(currPage, selector.SelectedShape, value);
+                    ExecuteCommand(command);
+                }
             }
         }
         public SolidColorBrush FillColor
@@ -157,6 +173,11 @@ namespace Paint
                 fillColor = value;
                 OnPropertyChanged(nameof(FillColor));
                 ColorFillChanged();
+                if (selector.SelectedShape != null)
+                {
+                    ChangeFillColor command = new ChangeFillColor(currPage, selector.SelectedShape, value);
+                    ExecuteCommand(command);
+                }
             }
         }
         // ==== Interactive attributes ====
