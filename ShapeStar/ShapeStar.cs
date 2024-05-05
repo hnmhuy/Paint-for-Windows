@@ -38,7 +38,8 @@ namespace ShapeStar
             star.StrokeDashArray = this.dashArray;
             star.Points = CalculateStarPoints(width, height);
             _canvas.Children.Add(star);
-
+            base.AttachEventHandler(star);
+            base.generateShapeContent();
             return _canvas;
         }
 

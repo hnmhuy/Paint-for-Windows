@@ -79,6 +79,8 @@ namespace ShapeLine
                 Fill = this._colorFill,
             };
 
+            base.AttachEventHandler(line);
+            base.generateShapeContent();
             this._canvas.Children.Add(line);
             return _canvas;
         }
