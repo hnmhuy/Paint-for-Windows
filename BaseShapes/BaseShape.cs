@@ -3,8 +3,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Markup;
 using System.Windows.Media;
+using System.Xaml.Permissions;
 
 namespace BaseShapes
 {
@@ -22,6 +25,9 @@ namespace BaseShapes
         protected bool isDashStroke = true;
         protected bool canSelect = false;
         protected bool canAddText = false;
+        protected string contentOnShape;
+        protected SolidColorBrush textColor;
+        protected SolidColorBrush textBackgroundColor;
         protected ShapeSelector selector;
         public static double padding = 2;
         protected Cursor previousCursor;
@@ -29,6 +35,9 @@ namespace BaseShapes
         public ShapeSelector Selector { get { return selector; } set { selector = value; } }
         public bool CanSelect { get { return canSelect; } set { canSelect = value; } }
         public bool CanAddText{ get { return canAddText; } set { canAddText = value; } }
+        public string ContentOnShape { get { return contentOnShape; } set { contentOnShape = value; } }
+        public SolidColorBrush TextColor { get { return textColor; } set { textColor = value; } }
+        public SolidColorBrush TextBackgroundColor { get { return textBackgroundColor; } set { textBackgroundColor= value; } }
         public BaseShape()
         {
             _start = new Point(0, 0);
@@ -97,6 +106,26 @@ namespace BaseShapes
             }
         }
 
+        public void generateShapeContent()
+        {
+            if (contentOnShape == null || _canvas == null)
+                return;
+            RichTextBox richTextBox = new RichTextBox()
+            {
+                Width = _end.X - _start.X - 10,
+            };
+            FlowDocument document = (FlowDocument)XamlReader.Parse(contentOnShape);
+            // Set the FlowDocument as the content of the RichTextBox
+            richTextBox.Document = document;
+            richTextBox.IsEnabled = false;
+            richTextBox.BorderBrush = Brushes.Transparent;
+            richTextBox.Foreground = textColor;
+            richTextBox.Background = textBackgroundColor;
+            _canvas.Children.Add(richTextBox);
+            Canvas.SetLeft(richTextBox, 5);
+            Canvas.SetTop(richTextBox, 5);
+        }
+
         public abstract object Clone();
         public abstract void Resize();
         public abstract void SetStrokeColor(SolidColorBrush color);
@@ -125,6 +154,18 @@ namespace BaseShapes
                     writer.Write(dash);
                 }
             }
+            if (contentOnShape != null)
+            {
+                writer.Write(true);
+                writer.Write(contentOnShape);
+                writer.Write(textColor.Color.ToString());
+                writer.Write(textBackgroundColor.Color.ToString());
+
+            }
+            else
+            {
+                writer.Write(false);
+            }
         }
 
         // Loading shapes from file
@@ -144,6 +185,13 @@ namespace BaseShapes
                 {
                     dashArray.Add(reader.ReadDouble());
                 }
+            }
+            bool haveText = reader.ReadBoolean();
+            if(haveText)
+            {
+                contentOnShape = reader.ReadString();
+                textColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString(reader.ReadString()));
+                textBackgroundColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString(reader.ReadString()));
             }
         }
 

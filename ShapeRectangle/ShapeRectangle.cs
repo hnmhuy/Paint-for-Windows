@@ -36,6 +36,9 @@ namespace ShapeRectangle
             };
             base.AttachEventHandler(rectangle);
             this._canvas.Children.Add(rectangle);
+            base.generateShapeContent();
+            Canvas.SetTop(_canvas, _start.Y);
+            Canvas.SetLeft(_canvas, _start.X);
             return _canvas;
         }
 
