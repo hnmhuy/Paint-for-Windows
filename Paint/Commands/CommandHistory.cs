@@ -4,10 +4,17 @@
     {
         private List<Command> historyCommands = new List<Command>();
         private int currentCommandIndex = -1;
+        private static int MAX_HISTORY_SIZE = 100;
         public CommandHistory() { }
 
         public void AddCoomand(Command command)
         {
+            // Checking the size of history
+            if (historyCommands.Count >= MAX_HISTORY_SIZE)
+            {
+                historyCommands.RemoveAt(0);
+                currentCommandIndex--;
+            }
             // Checking if the current command is not the last command in the history
             if (currentCommandIndex < historyCommands.Count - 1)
             {
@@ -51,6 +58,12 @@
         {
             historyCommands.RemoveAt(currentCommandIndex);
             currentCommandIndex--;
+        }
+
+        public void Clear()
+        {
+            historyCommands.Clear();
+            currentCommandIndex = -1;
         }
 
     }
