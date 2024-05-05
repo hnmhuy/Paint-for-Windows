@@ -116,20 +116,26 @@
             <StackPanel Style="{StaticResource ButtonGroup}">
                 <StackPanel Orientation="Horizontal">
                     <ui:Button
+                        x:Name="CopyButton"
                         Margin="8"
                         HorizontalAlignment="Center"
                         FontSize="24"
+                        Click="CopyButton_Click"
                         Icon="{ui:SymbolIcon Copy24}" />
                     <ui:Button
+                        x:Name="CutButton"
                         Margin="8"
                         HorizontalAlignment="Center"
                         FontSize="24"
+                        Click="CutButton_Click"
                         Icon="{ui:SymbolIcon Cut24}" />
                     <ui:Button
+                         x:Name="PasteButton"
                         Margin="8"
                         HorizontalAlignment="Center"
                         FontSize="24"
-                        Icon="{ui:SymbolIcon ClipBoardPaste24}" />
+                        Icon="{ui:SymbolIcon ClipBoardPaste24}"
+                        Click="PasteButton_Click"/>
                 </StackPanel>
                 <ui:TextBlock Text="Tools" TextAlignment="Center" />
             </StackPanel>

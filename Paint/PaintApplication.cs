@@ -33,6 +33,7 @@ namespace Paint
     public class PaintApplication : INotifyPropertyChanged
     {
         // ==== Attributes ====
+        private BaseShape tempShape;
         private ToolType currentTool = ToolType.None;
         public ToolType CurrentTool
         {
@@ -532,6 +533,36 @@ namespace Paint
             }
         }
 
+        public void Copy()
+        {
+            if(selector.SelectedShape != null)
+            {
+                tempShape = (BaseShape)selector.SelectedShape.Clone();
+            }
+        }
+        public void Cut()
+        {
+            if(selector.SelectedShape != null)
+            {
+                tempShape = (BaseShape)selector.SelectedShape.Clone();
+                CutCommand command = new CutCommand(selector.SelectedShape, currPage);
+                this.ExecuteCommand(command);
+            }    
+        }
+        public void PasteCommand()
+        {
+            if(tempShape != null)
+            {
+                Debug.WriteLine("here");
+                BaseShape generatedShape = (BaseShape)tempShape.Clone();
+                generatedShape.Render();
+                generatedShape.Move(new Point(50, 50));
+                selector.SelectShape(generatedShape);
+                PasteCommand command = new PasteCommand(currPage, generatedShape);
+                this.ExecuteCommand(command);
+
+            }
+        }
         public void OnMovingShape(Point end)
         {
             double deltaX = end.X - initalPoint.X;
