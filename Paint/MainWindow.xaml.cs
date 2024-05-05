@@ -38,15 +38,10 @@ namespace Paint
                 {
                     SingleShapeSelector.IsChecked = true;
                 }
-                else if(application.CurrentTool == ToolType.AddText)
-                {
-                    AddTextButton.IsChecked = true;
-                }    
                 else
                 {
                     SingleShapeSelector.IsChecked = false;
                     CopyToClipboard.IsChecked = false;
-                    AddTextButton.IsChecked = false;
                 }
             }
         }
@@ -201,6 +196,7 @@ namespace Paint
             if (e.NewValue.HasValue)
             {
                 application.StrokeColor = new SolidColorBrush(e.NewValue.Value);
+                application.TextColor = new SolidColorBrush(e.NewValue.Value);
                 Debug.WriteLine("Outline color: " + e.NewValue.Value);
 
             }
@@ -221,6 +217,8 @@ namespace Paint
             {
                 application.FillColor = new SolidColorBrush(Colors.Transparent);
             }
+            application.TextBackgroundColor = new SolidColorBrush(e.NewValue.Value);
+
         }
 
         private void CopyToClipboard_Click(object sender, RoutedEventArgs e)
@@ -314,26 +312,9 @@ namespace Paint
             application.UnselectShape();
             CopyToClipboard.IsChecked = false;
             application.ChangeToSelectingMode((bool)SingleShapeSelector.IsChecked);
-            AddTextButton.IsEnabled = true;
-            AddTextButton.IsChecked = false;
+
             
         }
 
-        private void AddTextButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (((ToggleButton)sender).IsChecked == true)
-            {
-                application.ChangeToAddTextMode((bool)AddTextButton.IsChecked);
-            }
-            else
-            {
-                application.CurrentTool = ToolType.None;
-            }
-        }
-
-        private void AddLayer_Click(object sender, RoutedEventArgs e)
-        {
-            application.AddLayer();
-        }
     }
 }

@@ -241,21 +241,8 @@
                 <ui:TextBlock Text="Layer" TextAlignment="Center" />
             </StackPanel>
             <StackPanel Orientation="Vertical" VerticalAlignment="Center">
-                <xctk:ColorPicker x:Name="OutlineColorPicker" Height="30" Width="150" SelectedColor="Black"  DisplayColorAndName="True" Margin="0 0 0 10" SelectedColorChanged="OutlineColorPicker_SelectedColorChanged"></xctk:ColorPicker>
-                <xctk:ColorPicker x:Name="FillColorPicker" Height="30" Width="150" SelectedColor="White"  DisplayColorAndName="True" SelectedColorChanged="FillColorPicker1_SelectedColorChanged"></xctk:ColorPicker>
-            </StackPanel>
-
-            <StackPanel Orientation="Vertical">
-                <ToggleButton
-                    Margin="8"
-                    HorizontalAlignment="Center"
-                    x:Name="AddTextButton"
-                    ToolTip="Text"
-                    Click="AddTextButton_Click"
-                    FontSize="24"
-                    IsEnabled="False"
-                    Content="{ui:SymbolIcon TextColor24}" />
-                <ui:TextBlock Text="Text" TextAlignment="Center" />
+                <xctk:ColorPicker ToolTip="Outline Color, Text Color" x:Name="OutlineColorPicker" Height="30" Width="150" SelectedColor="Black"  DisplayColorAndName="True" Margin="0 0 0 10" SelectedColorChanged="OutlineColorPicker_SelectedColorChanged"></xctk:ColorPicker>
+                <xctk:ColorPicker ToolTip="Fill Color, Background Text Color" x:Name="FillColorPicker" Height="30" Width="150" SelectedColor="White"  DisplayColorAndName="True" SelectedColorChanged="FillColorPicker1_SelectedColorChanged"></xctk:ColorPicker>
             </StackPanel>
 
         </StackPanel>
