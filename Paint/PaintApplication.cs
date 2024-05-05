@@ -22,6 +22,7 @@ namespace Paint
         CopyToClipboard,
         Select,
         MovingShape,
+        AddText,
         None
     }
     public class PaintApplication : INotifyPropertyChanged
@@ -460,6 +461,104 @@ namespace Paint
                 }
             }
             return isEmpty;
+        }
+
+        public void ChangeToSelectingMode(bool isSelecting)
+        {
+            CurrentTool = isSelecting ? ToolType.Select : ToolType.None;
+            foreach(var page in papers)
+            {
+                page.ChangeToSelect(isSelecting);
+            }
+        }
+
+        public void ChangeToAddTextMode(bool isAddingText)
+        {
+            CurrentTool = isAddingText ? ToolType.AddText : ToolType.None;
+            foreach (var page in papers)
+            {
+                page.ChangeToAddText(isAddingText);
+            }
+
+        }
+
+        public void SelectorMouseHandler()
+        {
+            Canvas bounder = ShapeSelector.Border;
+            Rectangle? rect = bounder.Children[0] as Rectangle;
+            Cursor currCursor = Mouse.OverrideCursor;
+            
+            if (rect!=null)
+            {
+                rect.MouseEnter += (sender, e) =>
+                {
+                    if(currentTool != ToolType.AddText)
+                    {
+                        if (currCursor != Mouse.OverrideCursor)
+                        {
+                            currCursor = Mouse.OverrideCursor;
+                        }
+                        Mouse.OverrideCursor = Cursors.SizeAll;
+                    }
+                    else
+                    {
+                        Mouse.OverrideCursor = Cursors.IBeam;
+                    }    
+                  
+                };
+                rect.MouseLeave += (sender, e) =>
+                {
+                    Mouse.OverrideCursor = currCursor;
+                };
+
+                rect.MouseDown += (sender, e) =>
+                {
+                    if(currentTool != ToolType.AddText)
+                    {
+                        selector.SelectedShape.content.Opacity = 0.8;
+                        initalPoint = e.GetPosition(mainPage);
+                        currentTool = ToolType.MovingShape;
+                    }
+                    else
+                    {
+                        currentTool = ToolType.AddText;
+                        onAddingText();
+                    }    
+                };
+                rect.MouseMove += (sender, e) =>
+                {
+                    if (currentTool == ToolType.AddText)
+                    {
+                        Mouse.OverrideCursor = Cursors.IBeam;
+                    }
+
+                };
+            }
+        }
+
+        public void onAddingText()
+        {
+            TextBlock textBlock = new TextBlock();
+            textBlock.Text = "hahah";
+            selector.SelectedShape.content.Children.Add(textBlock);
+        }
+
+        public void OnMovingShape(Point end)
+        {
+            double deltaX = end.X - initalPoint.X;
+            double deltaY = end.Y - initalPoint.Y;           
+            selector.SelectedShape.content.SetValue(Canvas.LeftProperty, selector.SelectedShape.Start.X + deltaX);
+            selector.SelectedShape.content.SetValue(Canvas.TopProperty, selector.SelectedShape.Start.Y + deltaY);
+        }
+
+        public void OnMovingShapeComplete(Point newPoint)
+        {
+            selector.SelectedShape.content.Opacity = 1;            
+            currentTool = ToolType.Select;
+            double deltaX = newPoint.X - initalPoint.X;
+            double deltaY = newPoint.Y - initalPoint.Y;
+            ShapeMoveCommand command = new ShapeMoveCommand(selector, new Point(deltaX, deltaY), currPage);
+            ExecuteCommand(command);
         }
     }
 }

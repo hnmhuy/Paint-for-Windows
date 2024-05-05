@@ -21,12 +21,14 @@ namespace BaseShapes
         protected DoubleCollection dashArray;
         protected bool isDashStroke = true;
         protected bool canSelect = false;
+        protected bool canAddText = false;
         protected ShapeSelector selector;
         public static double padding = 2;
         protected Cursor previousCursor;
        
         public ShapeSelector Selector { get { return selector; } set { selector = value; } }
         public bool CanSelect { get { return canSelect; } set { canSelect = value; } }
+        public bool CanAddText{ get { return canAddText; } set { canAddText = value; } }
         public BaseShape()
         {
             _start = new Point(0, 0);
@@ -168,6 +170,7 @@ namespace BaseShapes
                 selector.SelectShape(this);
                 Debug.WriteLine("Change selected shape: " + this.Start.X + ";" + this.Start.Y);
             };
+           
         }
 
         public void Move(Point movingDistance)

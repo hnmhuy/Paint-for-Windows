@@ -37,10 +37,15 @@ namespace Paint
                 {
                     SingleShapeSelector.IsChecked = true;
                 }
+                else if(application.CurrentTool == ToolType.AddText)
+                {
+                    AddTextButton.IsChecked = true;
+                }    
                 else
                 {
                     SingleShapeSelector.IsChecked = false;
                     CopyToClipboard.IsChecked = false;
+                    AddTextButton.IsChecked = false;
                 }
             }
         }
@@ -307,6 +312,21 @@ namespace Paint
             application.UnselectShape();
             CopyToClipboard.IsChecked = false;
             application.ChangeToSelectingMode((bool)SingleShapeSelector.IsChecked);
+            AddTextButton.IsEnabled = true;
+            AddTextButton.IsChecked = false;
+            
+        }
+
+        private void AddTextButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (((ToggleButton)sender).IsChecked == true)
+            {
+                application.ChangeToAddTextMode((bool)AddTextButton.IsChecked);
+            }
+            else
+            {
+                application.CurrentTool = ToolType.None;
+            }
         }
     }
 }

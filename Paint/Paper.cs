@@ -80,6 +80,15 @@ namespace Paint
             }
         }
 
+        public void ChangeToAddText(bool isAddingText)
+        {
+            foreach (var shape in drawnShapes)
+            {
+                shape.CanAddText = isAddingText;
+            }
+        }
+
+
         public void Replace(BaseShape oldShape, BaseShape newShape)
         {
             int index = drawnShapes.IndexOf(oldShape);
