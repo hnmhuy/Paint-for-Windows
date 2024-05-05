@@ -15,6 +15,8 @@ namespace ShapeStar
         {
             _name = nameof(ShapeStar);
             _iconName = "star.png";
+            id = BaseShape.GenerateId();
+
         }
 
         public override object Clone()

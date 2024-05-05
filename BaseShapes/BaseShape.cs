@@ -25,12 +25,21 @@ namespace BaseShapes
         protected ShapeSelector selector;
         public static double padding = 2;
         protected Cursor previousCursor;
+        protected String id;
        
         public ShapeSelector Selector { get { return selector; } set { selector = value; } }
         public bool CanSelect { get { return canSelect; } set { canSelect = value; } }
         public bool CanAddText{ get { return canAddText; } set { canAddText = value; } }
+
+        public static String GenerateId()
+        {
+            // Base on time
+            return DateTime.Now.Ticks.ToString();
+        }
+
         public BaseShape()
         {
+            id = GenerateId();
             _start = new Point(0, 0);
             _end = new Point(0, 0);
             strokeThickness = 1;
@@ -43,6 +52,7 @@ namespace BaseShapes
         public Canvas content { get { return _canvas; } }
         public Point Start { get { return _start; } }
         public Point End { get { return _end; } }
+        public String Id { get { return id; } }
 
         public virtual void SetPosition(Point start, Point end)
         {
@@ -108,6 +118,7 @@ namespace BaseShapes
         // Save the shape to a file
         public virtual void Save(BinaryWriter writer)
         {
+            writer.Write(id);
             writer.Write(_start.X);
             writer.Write(_start.Y);
             writer.Write(_end.X);
@@ -130,6 +141,7 @@ namespace BaseShapes
         // Loading shapes from file
         public virtual void Load(BinaryReader reader)
         {
+            id = reader.ReadString();
             _start = new Point(reader.ReadDouble(), reader.ReadDouble());
             _end = new Point(reader.ReadDouble(), reader.ReadDouble());
             _colorStroke = new SolidColorBrush((Color)ColorConverter.ConvertFromString(reader.ReadString()));

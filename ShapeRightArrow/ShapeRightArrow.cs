@@ -13,6 +13,8 @@ namespace ShapeRightArrow
         {
             _name = nameof(ShapeRightArrow);
             _iconName = "right_arrow.png";
+            id = BaseShape.GenerateId();
+
         }
         public override object Clone()
         {

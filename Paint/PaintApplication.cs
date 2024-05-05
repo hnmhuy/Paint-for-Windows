@@ -2,11 +2,11 @@
 using Microsoft.Win32;
 using Paint.Commands;
 using Paint.Models;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -40,8 +40,8 @@ namespace Paint
             }
         }
         public event PropertyChangedEventHandler? PropertyChanged;
-        private List<BaseShape> prototypes = new List<BaseShape>();
-        private List<Paper> papers = new List<Paper>();
+        public List<BaseShape> prototypes = new List<BaseShape>();
+        public ObservableCollection<Paper> Layers = new ObservableCollection<Paper>();
         private Paper currPage;
         public List<Type> loadedType = new List<Type>();
         public Paper CurrentPage { get { return currPage; } }
@@ -61,6 +61,14 @@ namespace Paint
                 drawSpace = value;
                 OnPropertyChanged(nameof(DrawSpace));
             }
+        }
+        private StackPanel layerReview;
+        public StackPanel LayerReview { 
+            get { return layerReview; } 
+            set { 
+                layerReview = value;
+                UpdateLayerReview();
+            } 
         }
 
         // ==== Drawing attributes ====
@@ -148,10 +156,15 @@ namespace Paint
         public PaintApplication()
         {
             LoadPrototypes();
-            papers.Add(currPage = new Paper(mainPage));
+            Layers.Add(currPage = new Paper(mainPage));
             undoCommand = new UndoCommand(commandHistory);
-            SelectorMouseHandler();
+            SelectorMouseHandler(); 
         }
+
+        //private void Layers_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        //{
+        //    UpdateLayerReview();
+        //}
 
         // === Set up methods ===
         private void LoadPrototypes()
@@ -221,7 +234,7 @@ namespace Paint
         public void ChangeToSelectingMode(bool isSelecting)
         {
             CurrentTool = isSelecting ? ToolType.Select : ToolType.None;
-            foreach (var page in papers)
+            foreach (var page in Layers)
             {
                 page.ChangeToSelect(isSelecting);
             }
@@ -229,11 +242,74 @@ namespace Paint
         public void ChangeToAddTextMode(bool isAddingText)
         {
             CurrentTool = isAddingText ? ToolType.AddText : ToolType.None;
-            foreach (var page in papers)
+            foreach (var page in Layers)
             {
                 page.ChangeToAddText(isAddingText);
             }
 
+        }
+
+        private Grid GeneratePreviewLayer(Paper paper)
+        {
+            Grid stack = new Grid()
+            {
+                Margin = new Thickness(5),
+            };
+            stack.Children.Add(paper.PreviewLayer);
+
+            ToggleButton button = new ToggleButton()
+            {
+                Width = 40,
+                Height = 40,
+                Content = new Image()
+                {
+                    Source = new BitmapImage(new Uri(AppDomain.CurrentDomain.BaseDirectory + "//Assets//Icon//invisible.png")),
+                    Stretch = System.Windows.Media.Stretch.Uniform
+                },
+                HorizontalAlignment = HorizontalAlignment.Right,
+                VerticalAlignment = VerticalAlignment.Top,
+               
+            };
+
+            button.Click += (sender, e) =>
+            {
+                if (button.IsChecked == true)
+                {
+                    Debug.WriteLine("Hide layer");
+                    paper.SetVisibility(false);
+                }
+                else
+                {
+                    Debug.WriteLine("Show layer");
+                    paper.SetVisibility(true);
+                }
+            };
+
+            stack.MouseDown += (sender, e) =>
+            {
+                // Only for left mouse button
+                if (e.ClickCount == 2 && e.ChangedButton == MouseButton.Left)
+                {
+                    currPage = paper;
+                    Debug.WriteLine("Change to layer: " + Layers.IndexOf(paper));
+                }
+            };
+            stack.Children.Add(button);
+            return stack;
+        }
+
+        private void UpdateLayerReview()
+        {
+            foreach (var paper in Layers)
+            {
+                layerReview.Children.Add(GeneratePreviewLayer(paper));
+            }
+        }
+
+        public void AddLayer()
+        {
+            Layers.Add(currPage = new Paper(mainPage));
+            layerReview.Children.Add(GeneratePreviewLayer(currPage));
         }
 
         // ==== Mouse events ====
@@ -242,7 +318,7 @@ namespace Paint
         private void Canvas_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             // Identify the clicked canvas
-            Canvas clickedCanvas = sender as Canvas;
+            Canvas? clickedCanvas = sender as Canvas;
             if (clickedCanvas != null)
             {
                 // Perform actions based on the clicked canvas
@@ -315,7 +391,7 @@ namespace Paint
                 };
                 rect.MouseLeave += (sender, e) =>
                 {
-                    Mouse.OverrideCursor = currCursor;
+                    Mouse.OverrideCursor = Cursors.Arrow;
                 };
 
                 rect.MouseDown += (sender, e) =>
@@ -352,11 +428,13 @@ namespace Paint
         public void OnMovingShapeComplete(Point newPoint)
         {
             selector.SelectedShape.content.Opacity = 1;
+            Mouse.OverrideCursor = Cursors.Arrow;
             currentTool = ToolType.Select;
             double deltaX = newPoint.X - initalPoint.X;
             double deltaY = newPoint.Y - initalPoint.Y;
             ShapeMoveCommand command = new ShapeMoveCommand(selector, new Point(deltaX, deltaY), currPage);
             ExecuteCommand(command);
+            Debug.WriteLine("Move shape: " + selector.SelectedShape.Id);    
         }
 
         //= Add text
@@ -447,8 +525,8 @@ namespace Paint
             {
                 using (BinaryWriter writer = new BinaryWriter(File.Open(saveFileDialog.FileName, FileMode.Create)))
                 {
-                    writer.Write(papers.Count);
-                    foreach (var paper in papers)
+                    writer.Write(Layers.Count);
+                    foreach (var paper in Layers)
                     {
                         paper.Save(writer);
                     }
@@ -457,8 +535,8 @@ namespace Paint
         }
         public void OpenFile()
         {
-            papers.Clear();
-            drawSpace.Children.Clear();
+            Layers.Clear();
+            LayerReview.Children.Clear();
             mainPage.Children.Clear();
             commandHistory.Clear();
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -473,26 +551,28 @@ namespace Paint
                     for (int i = 0; i < count; i++)
                     {
                         Paper paper = new Paper(mainPage);
-                        paper.Load(reader, loadedType);
-                        papers.Add(paper);
-                        drawSpace.Children.Add(paper.Content);
+                        paper.Load(reader, prototypes, selector);
+                        Layers.Add(paper);
                     }
                 }
             }
-            currPage = papers[papers.Count - 1];
+            currPage = Layers[Layers.Count - 1];
+            UpdateLayerReview();
         }
         public void NewFile()
         {
-            papers.Clear();
+            Layers.Clear();
+            layerReview.Children.Clear();
             mainPage.Children.Clear();
             drawSpace.Children.Clear();
-            papers.Add(currPage = new Paper(mainPage));
+            Layers.Add(currPage = new Paper(mainPage));
             drawSpace.Children.Add(mainPage);
+            UpdateLayerReview();
         }
         public bool IsEmpty()
         {
             bool isEmpty = true;
-            foreach (var paper in papers)
+            foreach (var paper in Layers)
             {
                 if (paper.Content.Children.Count > 0)
                 {

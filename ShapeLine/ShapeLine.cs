@@ -17,6 +17,8 @@ namespace ShapeLine
         public ShapeLine() { 
             _name= nameof(ShapeLine);
             _iconName = "line.png";
+            id = BaseShape.GenerateId();
+
         }
         public override object Clone()
         {

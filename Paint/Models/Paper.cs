@@ -1,14 +1,37 @@
 ﻿using BaseShapes;
 using Paint.Controller;
+using System.ComponentModel;
 using System.IO;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace Paint.Models
 {
-    public class Paper
+    public class Paper : INotifyPropertyChanged
     {
+        private static double previewWidth = 120;
+        private static double previewHeight = 100;
         private Canvas _content;
         private List<BaseShape> drawnShapes = new List<BaseShape>();
+        private List<BaseShape> previewShapes = new List<BaseShape>();  
+
+        private Canvas _preivewLayer = new Canvas() { 
+            AllowDrop = false, 
+            IsEnabled = false,
+            Width = previewWidth,
+            Height = previewHeight,
+            Background = Brushes.Wheat
+        };
+        public Canvas PreviewLayer { get { return _preivewLayer; } }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+        // Implement the OnPropertyChanged method
+        protected void OnPropertyChanged(string name)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
         public List<BaseShape> DrawnShapes { get { return drawnShapes; } }
         public Canvas Content { get { return _content; } }
 
@@ -17,18 +40,51 @@ namespace Paint.Models
             _content = mainPage;
         }
 
+        private void AddShapeReview(BaseShape shape, int index = -1)
+        {
+            BaseShape temp = (BaseShape)shape.Clone();
+            if(index == -1)
+            {
+                previewShapes.Add(temp);
+            } else
+            {
+                previewShapes.Insert(index, temp);
+            }
+            double scaleX = previewWidth / _content.ActualWidth;
+            double scaleY = previewHeight / _content.ActualHeight;
+            temp.SetPosition(new Point(temp.Start.X * scaleX, temp.Start.Y * scaleY), new Point(temp.End.X * scaleX, temp.End.Y * scaleY));
+            temp.Render();
+
+            if (index == -1)
+            {
+                _preivewLayer.Children.Add(temp.content);
+            } else
+            {
+                _preivewLayer.Children.Insert(index, temp.content);
+            }
+            Canvas.SetTop(temp.content, temp.Start.Y);
+            Canvas.SetLeft(temp.content, temp.Start.X);
+            OnPropertyChanged(nameof(PreviewLayer));
+        }
+
         public void AddShape(BaseShape shape)
         {
             drawnShapes.Add(shape);
             _content.Children.Add(shape.content);
             Canvas.SetTop(shape.content, shape.Start.Y);
             Canvas.SetLeft(shape.content, shape.Start.X);
+            OnPropertyChanged(nameof(DrawnShapes));
+            AddShapeReview(shape);
         }
 
         public void RemoveShape(BaseShape shape)
         {
             drawnShapes.Remove(shape);
             _content.Children.Remove(shape.content);
+            int index = previewShapes.IndexOf(shape);
+            _preivewLayer.Children.Remove(previewShapes[index].content);
+            previewShapes.RemoveAt(index);
+            OnPropertyChanged(nameof(DrawnShapes));
         }
 
         public void Save(BinaryWriter binaryWriter)
@@ -41,16 +97,15 @@ namespace Paint.Models
             }
         }
 
-        public void Load(BinaryReader binaryReader, List<Type> types)
+        public void Load(BinaryReader binaryReader, List<BaseShape> types, ShapeSelector selector)
         {
             int count = binaryReader.ReadInt32();
             for (int i = 0; i < count; i++)
             {
                 string name = binaryReader.ReadString();
-                BaseShape shape = ShapeFactory.CreateShape(types, name, binaryReader);
-                if (shape != null)
+                BaseShape shape = CreateShape(types, name, binaryReader);
+                if (shape != null) 
                 {
-                    shape.Render();
                     AddShape(shape);
                 }
             }
@@ -58,8 +113,10 @@ namespace Paint.Models
 
         public void Clear()
         {
-            drawnShapes.Clear();
-            _content.Children.Clear();
+            foreach(BaseShape shape in drawnShapes)
+            {
+                RemoveShape(shape);
+            }
         }
 
         public void RenderAll()
@@ -92,7 +149,9 @@ namespace Paint.Models
 
         public void Replace(BaseShape oldShape, BaseShape newShape)
         {
-            int index = drawnShapes.IndexOf(oldShape);
+            // Finding old shape basing on id
+            int index = drawnShapes.FindIndex(shape => shape.Id == oldShape.Id);
+
             if (index != -1)
             {
                 // Remove the old shape
@@ -105,7 +164,36 @@ namespace Paint.Models
                 _content.Children.Insert(contentIndex, newShape.content);
                 // Add the new shape to the list
                 drawnShapes.Insert(index, newShape);
+
+                _preivewLayer.Children.Remove(previewShapes[index].content);
+                AddShapeReview(newShape, index);
+
             }
+        }
+
+        public void SetVisibility(bool isVisible)
+        {
+            Visibility visibility = isVisible ? Visibility.Visible : Visibility.Hidden;
+            foreach (var shape in drawnShapes)
+            {
+                shape.content.Visibility = visibility;
+            }
+        }
+
+        BaseShape CreateShape(List<BaseShape> prototypes, string name, BinaryReader reader)
+        {
+            BaseShape shape = null;
+            foreach (BaseShape prototype in prototypes)
+            {
+                if (prototype.Name == name)
+                {
+                    shape = (BaseShape)prototype.Clone();
+                    shape.Load(reader);
+                    shape.Render();
+                    break;
+                }
+            }
+            return shape;
         }
     }
 }

@@ -12,18 +12,19 @@ namespace Paint.Controller
     public class ShapeFactory
     {
 
-        public static BaseShape CreateShape(List<Type> types, string name, BinaryReader reader)
+        public static BaseShape CreateShape(List<BaseShape> prototypes, string name, BinaryReader reader)
         {
-            BaseShape? shape = null;
-            // Find the type of the shape from types list
-            Type type = types.FirstOrDefault(t => t.Name == name);
-
-            if (type != null)
+            BaseShape shape = null;
+            foreach (BaseShape prototype in prototypes)
             {
-                shape = (BaseShape)Activator.CreateInstance(type);
-                shape.Load(reader);
+                if (prototype.Name == name)
+                {
+                    shape = (BaseShape)prototype.Clone();
+                    shape.Load(reader);
+                    shape.Render();
+                    break;
+                }
             }
-
             return shape;
         }
     }

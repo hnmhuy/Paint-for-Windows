@@ -12,6 +12,8 @@ namespace ShapeLeftArrow
         {
             _name = nameof(ShapeLeftArrow);
             _iconName = "left_arrow.png";
+            id = BaseShape.GenerateId();
+
         }
         public override object Clone()
         {

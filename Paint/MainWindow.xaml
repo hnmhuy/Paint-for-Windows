@@ -73,6 +73,10 @@
         </Style>
 
     </Window.Resources>
+
+    <Window.DataContext>
+        <local:PaintApplication/>
+    </Window.DataContext>
    
     <Grid>
         <Grid.RowDefinitions>
@@ -277,12 +281,16 @@
             </ScrollViewer>
         </Border>
 
-        <Border Grid.Row="2" HorizontalAlignment="Right" Width="120" Margin="12" ClipToBounds="True" CornerRadius="8" Background="{ui:ThemeResource TextFillColorSecondaryBrush}">
+        <Border Grid.Row="2" HorizontalAlignment="Right" Width="120" Margin="12" ClipToBounds="True" CornerRadius="8" Background="White" BorderBrush="Black">
             <StackPanel Orientation="Vertical">
-                <Button Content="{ui:SymbolIcon AddCircle24}" Background="Transparent" BorderBrush="Transparent" HorizontalAlignment="Center"/>
+                <Button Content="{ui:SymbolIcon AddCircle24}" 
+                        Background="Transparent" 
+                        BorderBrush="Transparent"
+                        Name="AddLayer"
+                        Click="AddLayer_Click"
+                        HorizontalAlignment="Center"/>
                 <Separator/>
-                
-                
+                <StackPanel Orientation="Vertical" x:Name="LayerReviews"/>
             </StackPanel>
         </Border>
         

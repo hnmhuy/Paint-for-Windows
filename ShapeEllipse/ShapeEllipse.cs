@@ -14,7 +14,7 @@ namespace ShapeEllipse
         public ShapeEllipse() {
             _name = nameof(ShapeEllipse);
             _iconName = "ellipse.png";
-
+            id = BaseShape.GenerateId();
         }
         public override object Clone()
         {

@@ -12,10 +12,10 @@ namespace ShapeRectangle
 
         public ShapeRectangle()
         {
+            
             _name = nameof(ShapeRectangle);
             _iconName = "rectangle.png";
         }
-
         public override object Clone()
         {
             return MemberwiseClone();

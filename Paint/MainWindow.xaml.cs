@@ -18,7 +18,8 @@ namespace Paint
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = application;
+            
+            this.DataContext = application;
             application.GenerateShapeControls(ShapeList);
             application.PropertyChanged += Application_PropertyChanged;
             application.FillColor = new SolidColorBrush(Colors.Transparent);
@@ -54,6 +55,7 @@ namespace Paint
         {
             application.DrawSpace = DrawSpace;
             DrawSpace.Children.Add(application.MainPage);
+            application.LayerReview = LayerReviews;
         }
 
         private void DrawSpace_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -327,6 +329,11 @@ namespace Paint
             {
                 application.CurrentTool = ToolType.None;
             }
+        }
+
+        private void AddLayer_Click(object sender, RoutedEventArgs e)
+        {
+            application.AddLayer();
         }
     }
 }
