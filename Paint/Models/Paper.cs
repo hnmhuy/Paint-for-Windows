@@ -53,9 +53,9 @@ namespace Paint.Models
             }
             double scaleX = previewWidth / _content.ActualWidth;
             double scaleY = previewHeight / _content.ActualHeight;
-            temp.SetPosition(new Point(temp.Start.X * scaleX, temp.Start.Y * scaleY), new Point(temp.End.X * scaleX, temp.End.Y * scaleY));
+            temp.SetPosition(new Point(temp.Start.X * scaleX, temp.Start.Y * scaleY), new Point(temp.End.X * scaleX, temp.End.Y * scaleY));            
             temp.Render();
-
+            temp.SetStrokeThickness(1);
             if (index == -1)
             {
                 _preivewLayer.Children.Add(temp.content);
@@ -84,6 +84,12 @@ namespace Paint.Models
 
         public void AddShape(BaseShape shape)
         {
+            if (drawnShapes.Contains(shape))
+            {
+                Debug.WriteLine("Shape already exists");
+                return;
+            }
+
             drawnShapes.Add(shape);
             _content.Children.Add(shape.content);
             Canvas.SetTop(shape.content, shape.Start.Y);

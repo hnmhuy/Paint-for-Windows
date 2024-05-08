@@ -36,11 +36,14 @@ namespace Paint.Commands
         }
         public override void Execute()
         {
-            newShape = (BaseShape)this.backup.Clone();
-            newShape.ContentOnShape = contentOnShape;
-            newShape.TextColor = textColor;
-            newShape.TextBackgroundColor = textBackgroundColor;
-            newShape.Render();
+            if (newShape == null)
+            {
+                newShape = (BaseShape)this.backup.Clone();
+                newShape.ContentOnShape = contentOnShape;
+                newShape.TextColor = textColor;
+                newShape.TextBackgroundColor = textBackgroundColor;
+                newShape.Render();
+            }
 
             Canvas.SetTop(newShape.content, newShape.Start.Y);
             Canvas.SetLeft(newShape.content, newShape.Start.X);

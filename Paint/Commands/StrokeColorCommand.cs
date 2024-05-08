@@ -25,9 +25,12 @@ namespace Paint.Commands
 
         public override void Execute()
         {
-            newShape = (BaseShape) this.backup.Clone();
-            newShape.SetStrokeColor(newColor);
-            newShape.Render();
+            if (newShape == null)
+            {
+                newShape = (BaseShape)this.backup.Clone();
+                newShape.SetStrokeColor(newColor);
+                newShape.Render();
+            }
             Canvas.SetTop(newShape.content, newShape.Start.Y);
             Canvas.SetLeft(newShape.content, newShape.Start.X);
             receiver.Replace(this.backup, newShape);

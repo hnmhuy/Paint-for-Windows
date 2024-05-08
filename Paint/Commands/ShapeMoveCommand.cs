@@ -25,13 +25,17 @@ namespace Paint.Commands
             this.backup = selector.SelectedShape;
             this.movingDistance = movingDistance;
             this.receiver = receiver;
+           
         }   
 
         public override void Execute()
         {
-            newShape = (BaseShape)this.backup.Clone();
-            newShape.Render();
-            newShape.Move(movingDistance);         
+            if (newShape == null)
+            {
+                newShape = (BaseShape)backup.Clone();
+                newShape.Render();
+                newShape.Move(movingDistance);         
+            } 
             receiver.Replace(this.backup, newShape);   
             selector.SelectShape(newShape);
         }
