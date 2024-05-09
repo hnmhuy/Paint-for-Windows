@@ -24,7 +24,7 @@ namespace Paint
     public enum ToolType
     {
         Draw,
-        CopyToClipboard,
+        CopyToClipboard, 
         Select,
         MovingShape,
         AddText,
@@ -419,7 +419,8 @@ namespace Paint
         {
             if (!isDrawing || currPrototype == null) return;
             isDrawing = false;
-            if (initalPoint == currPrototype.End) return;
+            if (currPrototype.Start == currPrototype.End) return;
+            //if (initalPoint == currPrototype.End) return;
             currPage.Content.Children.Remove(drawingShape);
             BaseShape generatedShape = (BaseShape)currPrototype.Clone();
             generatedShape.Render();
@@ -849,6 +850,7 @@ namespace Paint
         }
         public void NewFile()
         {
+            commandHistory.Clear();
             Layers.Clear();
             layerReview.Children.Clear();
             mainPage.Children.Clear();

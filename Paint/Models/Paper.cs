@@ -38,7 +38,8 @@ namespace Paint.Models
 
         public Paper(Canvas mainPage)
         {
-            _content = mainPage;
+            _content = mainPage;           
+
         }
 
         private void AddShapeReview(BaseShape shape, int index = -1)
@@ -179,7 +180,7 @@ namespace Paint.Models
                 drawnShapes.Remove(oldShape);
                 // Find the index of the old shape in the content
                 int contentIndex = _content.Children.IndexOf(oldShape.content);
-                if (contentIndex == -1) { contentIndex = 0; }
+                if (contentIndex == -1) return;
                 // Remove the old shape from the content
                 _content.Children.Remove(oldShape.content);
                 // Add the new shape to the content
